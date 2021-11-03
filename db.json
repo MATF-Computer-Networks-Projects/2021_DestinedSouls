@@ -1,0 +1,12 @@
+{
+    "users":[
+        {
+            "email":"sgt.crowbar@gmail.com",
+            "password":"12345678"
+        },
+        {
+            "email":"forsaken.veselic@gmail.com",
+            "password":"12345678"
+        }
+    ]
+}
