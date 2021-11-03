@@ -1,10 +1,13 @@
 <div >
-    <div class="app-form">
+    <div class="app-form" >
         <app-ilustration></app-ilustration>
-        <app-form-input name="email" type="email" placeholder="Email"> </app-form-input>
-        <app-form-input name="password" type="password" placeholder="Password"></app-form-input>
-        <app-form-btn class="btn-primary" color="#00af2e" text="Login"></app-form-btn>
-        <app-form-btn class="btn-primary" color="#af0029" text="Sign up"></app-form-btn>
-        <app-form-label text="Forgot your email or password?" class="forgot"></app-form-label>
+        <form (ngSubmit)="onSubmit()">
+            <input name="email" type="email" placeholder="Email" class="input" [(ngModel)]="email">
+            <input name="password" type="password" placeholder="Password" class="input" [(ngModel)]="password">
+            <input  type="submit" value="Login" class="btn-primary" style="background-color:#00af2e;" >
+            <input  type="button" value="Sign up" class="btn-primary" style="background-color:#af0029;" >
+            <a href="#"  class="forgot">Forgot your email or password?</a>
+            <!--testing: <div>{{email}}<br>{{password}}</div>-->
+        </form>
     </div>
 </div>
