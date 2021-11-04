@@ -1,8 +1,9 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { Form } from './Form';
-import { Observable, throwError } from 'rxjs';
+import { LoginForm } from './Form';
+import { Observable, throwError, of } from 'rxjs';
 import { catchError, retry} from 'rxjs/operators';
 import { LoginService } from 'src/app/services/login.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-form',
@@ -10,26 +11,27 @@ import { LoginService } from 'src/app/services/login.service';
   styleUrls: ['./form.component.css']
 })
 export class FormComponent implements OnInit {
-  @Output() onLogin : EventEmitter<Form> = new EventEmitter();
-
+  @Output() onLogin : EventEmitter<LoginForm> = new EventEmitter();
+  /*onSubmit --> onLogin*/
   email:string | any;
   password:string | any;
   
   constructor(private loginServise : LoginService) { }
 
   ngOnInit(): void {  }
+
   onSubmit(){
     if(!this.email){
       alert("Please enter Email address");
       return;
     }
-    const newForm = {
+    const newLogin : LoginForm = {
       email: this.email,
       password: this.password
     }
-    
+
     //TODO send http POST
-    //this.onLogin.emit(newForm);
+    this.onLogin.emit(newLogin);
 
     this.email='';
     this.password='';

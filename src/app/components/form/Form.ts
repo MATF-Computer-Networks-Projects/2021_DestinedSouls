@@ -1,4 +1,4 @@
-export class Form {
+export class LoginForm {
     email:string | any;
     password:string | any;
 }

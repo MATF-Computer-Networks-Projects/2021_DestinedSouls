@@ -1,12 +1,19 @@
 {
-    "users":[
-        {
-            "email":"sgt.crowbar@gmail.com",
-            "password":"12345678"
-        },
-        {
-            "email":"forsaken.veselic@gmail.com",
-            "password":"12345678"
-        }
-    ]
+  "users": [
+    {
+      "id": 1,
+      "email": "sgt.crowbar@gmail.com",
+      "password": "12345678"
+    },
+    {
+      "id": 2,
+      "email": "forsaken.veselic@gmail.com",
+      "password": "12345678"
+    },
+    {
+      "email": "maria.veselic@gmail.com",
+      "password": "11111111111",
+      "id": 3
+    }
+  ]
 }
