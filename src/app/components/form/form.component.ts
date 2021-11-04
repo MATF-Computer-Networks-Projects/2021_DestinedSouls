@@ -15,6 +15,9 @@ export class FormComponent implements OnInit {
   /*onSubmit --> onLogin*/
   email:string | any;
   password:string | any;
+  showLogin:boolean = true;
+  showSignup:boolean = false;
+  showForgot:boolean = false;
   
   constructor(private loginServise : LoginService) { }
 
@@ -36,6 +39,23 @@ export class FormComponent implements OnInit {
     this.email='';
     this.password='';
     
+  }
+  onClickSignup(){
+    this.showLogin  = false;
+    this.showForgot = false;
+    this.showSignup = true; 
+  }
+
+  onClickLogin(){
+    this.showForgot = false;
+    this.showSignup = false;
+    this.showLogin  = true; 
+  }
+
+  onClickForgot(){
+    this.showLogin  = false;
+    this.showSignup = false;
+    this.showForgot = true; 
   }
 
 }
