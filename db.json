@@ -11,29 +11,22 @@
       "password": "12345678"
     },
     {
-      "email": "maria.veselic@gmail.com",
-      "password": "11111111111",
+      "email": "forsaken.veselic@gmail.com",
+      "password": "2222222222",
       "id": 3
-    },
-    {
-      "email": "maria.veselic@gmail.com",
-      "password": "11111111111",
-      "id": 4
-    },
-    {
-      "email": "sgt.crowbar@gmail.com",
-      "password": "111111111111",
-      "id": 5
-    },
-    {
-      "email": "kidikidi1998@gmail.com",
-      "password": "1222222222222",
-      "id": 6
-    },
-    {
-      "email": "sgt.crowbar@gmail.com",
-      "password": "44444444444444444",
-      "id": 7
     }
-  ]
+  ],
+  "signup": [
+    {
+      "name": "Aleksa",
+      "birthdate": "2021-11-08",
+      "gender": "1",
+      "interest": "2",
+      "email": "forsaken.veselic@gmail.com",
+      "password": "123",
+      "phone": "069",
+      "id": 1
+    }
+  ],
+  "forgot": []
 }

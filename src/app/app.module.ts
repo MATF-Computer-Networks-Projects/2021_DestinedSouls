@@ -8,18 +8,12 @@ import { AppComponent } from './app.component';
 import { FormComponent } from './components/form/form.component';
 import { IlustrationComponent } from './components/ilustration/ilustration.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ForgotFormComponent } from './components/forgot-form/forgot-form.component';
-import { LoginFormComponent } from './components/login-form/login-form.component';
-import { SignupFormComponent } from './components/signup-form/signup-form.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     FormComponent,
-    IlustrationComponent,
-    ForgotFormComponent,
-    LoginFormComponent,
-    SignupFormComponent    
+    IlustrationComponent    
   ],
   imports: [
     BrowserModule,
