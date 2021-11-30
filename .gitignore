@@ -21,6 +21,7 @@ chrome-profiler-events*.json
 *.launch
 .settings/
 *.sublime-workspace
+*.iml
 
 # IDE - VSCode
 .vscode/*
@@ -46,3 +47,5 @@ Thumbs.db
 
 Client/.angular
 Client/node_modules
+Client/dist
+Client/tmp
