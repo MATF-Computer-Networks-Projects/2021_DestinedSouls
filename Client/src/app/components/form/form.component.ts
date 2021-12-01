@@ -29,7 +29,7 @@ export class FormComponent implements OnInit {
   showLogin:boolean = true;
   showSignup:boolean = false;
   showForgot:boolean = false;
-  
+
   constructor(private loginServise : LoginService) { }
 
   ngOnInit(): void {  }
@@ -71,23 +71,35 @@ export class FormComponent implements OnInit {
     this.password='';
     this.phone='';
   }
-
+  onForgotSubmit(){
+    if(!this.email){
+      alert("Please enter e-mail");
+      return;
+    }
+    const newForgot : ForgotForm = {
+      email : this.email
+    }
+    this.onForgot.emit(newForgot);
+    alert("Recovery message sent to: " + this.email);
+    this.email='';
+    this.onClickLogin();
+  }
 
 
 
   onClickSignup(){
     this.showLogin  = false;
     this.showForgot = false;
-    this.showSignup = true; 
+    this.showSignup = true;
   }
   onClickLogin(){
     this.showForgot = false;
     this.showSignup = false;
-    this.showLogin  = true; 
+    this.showLogin  = true;
   }
   onClickForgot(){
     this.showLogin  = false;
     this.showSignup = false;
-    this.showForgot = true; 
+    this.showForgot = true;
   }
 }
