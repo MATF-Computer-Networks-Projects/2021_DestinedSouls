@@ -41,10 +41,10 @@
 
     <div class="app-form" *ngIf=showForgot style="text-align: center;">
         <app-ilustration></app-ilustration>
-        <form  (ngSubmit)="onSignupSubmit()">
+        <form  (ngSubmit)="onForgotSubmit()">
                 <small class="form-text text-muted" style="font-size: 20px;color: rgb(11,11,11);">Forgot your password?<br></small>
                 <small class="form-text text-muted" style="font-size: 17px;">Enter your email and we will send you a reset</small>
-                <input class="input" type="email" name="email" placeholder="Email">
+                <input class="input" type="email" name="email" placeholder="Email" [(ngModel)]="email">
                 <button class="btn btn-primary btn-block" type="submit" style="background-color: #76adc2;filter: saturate(100%);">Send Request </button>
         </form>
     </div>
