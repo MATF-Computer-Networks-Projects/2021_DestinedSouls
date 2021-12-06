@@ -16,6 +16,11 @@ final public class Response {
     Response(String pathDir, Map<String, ByteBuffer> cache) {
         this.responseBuffers = cache;
         this.publicHtmlDir = Paths.get(pathDir);
+        try {
+            fillLocalCache();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     Response(String pathDir) {

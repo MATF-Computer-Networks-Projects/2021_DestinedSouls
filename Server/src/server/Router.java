@@ -78,26 +78,18 @@ final public class Router {
         System.out.println("Server received request route: \"" + route + '\"');
         System.out.println("Data: \"" + data + '\"');
 
-        Matcher matcher = Parsers.loginPattern.matcher(data);
-        String email = null;
-        String pass = null;
-        if(matcher.find()) {
-            email = matcher.group(1);
-            System.out.print("Parsed:  email : " + email);
-            pass = matcher.group(2);
-            System.out.print(", pass : " + pass + '\n');
-        }
-        else {
-            key.attach(responseBuffers.get("404").duplicate());
-            key.interestOps(SelectionKey.OP_WRITE);
-            return;
-        }
-
-
 
         String res = null;
         switch (route) {
-            case "/auth": { res = UserService.authenticate(email, pass); break; }
+            case "/users/authenticate": {
+                res = authenticate(data);
+                break;
+            }
+            case "/users/register": {
+                key.attach(responseBuffers.get("501").duplicate());
+                key.interestOps(SelectionKey.OP_WRITE);
+                return;
+            }
             default: {
                 key.attach(responseBuffers.get("404").duplicate());
                 key.interestOps(SelectionKey.OP_WRITE);
@@ -126,5 +118,21 @@ final public class Router {
 
         key.attach(buf.duplicate());
         key.interestOps(SelectionKey.OP_WRITE);
+    }
+
+    private static String authenticate(String data) {
+        Matcher matcher = Parsers.loginPattern.matcher(data);
+        String email = null;
+        String pass = null;
+        if(matcher.find()) {
+            email = matcher.group(1);
+            System.out.print("Parsed:  email : " + email);
+            pass = matcher.group(2);
+            System.out.print(", pass : " + pass + '\n');
+        }
+        else {
+            return null;
+        }
+        return UserService.authenticate(email, pass);
     }
 }
