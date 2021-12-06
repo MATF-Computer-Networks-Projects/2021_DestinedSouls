@@ -10,7 +10,7 @@ import java.nio.file.Path;
 
 final class FileInfo {
 
-    static FileInfo get(Path path, Charset encoding) throws IOException {
+    public static FileInfo get(Path path, Charset encoding) throws IOException {
         try (var fin = new FileInputStream(path.toString())){
             FileChannel fc = fin.getChannel();
             ByteBuffer data = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
@@ -22,6 +22,9 @@ final class FileInfo {
         }
     }
 
+    public static FileInfo json(Charset encoding, byte[] data) {
+        return new FileInfo("application/json", encoding, ByteBuffer.wrap(data));
+    }
 
     private final String MIMEType;
     private final Charset encoding;

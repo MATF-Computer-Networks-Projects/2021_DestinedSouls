@@ -24,11 +24,11 @@ export class FormComponent implements OnInit {
   interest: string | any;
   email: string | any;
   password: string | any;
-  phone: string | any;
 
   showLogin:boolean = true;
   showSignup:boolean = false;
   showForgot:boolean = false;
+
 
   constructor(private loginServise : LoginService) { }
 
@@ -59,8 +59,7 @@ export class FormComponent implements OnInit {
       gender : this.gender,
       interest : this.interest,
       email : this.email,
-      password : this.password,
-      phone :  this.phone
+      password : this.password
     }
     this.onSignup.emit(newSignup);
 
@@ -69,7 +68,6 @@ export class FormComponent implements OnInit {
     this.interest='';
     this.email='';
     this.password='';
-    this.phone='';
   }
   onForgotSubmit(){
     if(!this.email){

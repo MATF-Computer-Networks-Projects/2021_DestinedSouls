@@ -16,5 +16,4 @@ export class SignupForm {
     interest: Interest | any;
     email: string | any;
     password: string | any;
-    phone: string | any;
 }

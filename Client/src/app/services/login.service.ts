@@ -16,18 +16,16 @@ const httpOptions = {
 })
 
 export class LoginService {
-  private dbUrl = 'http://localhost:5000';
-
   constructor(private http: HttpClient) {}
-  
+
   postUserLogin(newLogin: LoginForm):Observable<LoginForm>{
-    return this.http.post<LoginForm>(`${this.dbUrl}/users`, newLogin);/**3.arg httpOptions*/
+    return this.http.post<LoginForm>('/auth', newLogin);
   }
   postUserSignup(newSignup: SignupForm):Observable<SignupForm>{
-    return this.http.post<SignupForm>(`${this.dbUrl}/signup`, newSignup);/**3.arg httpOptions*/
+    return this.http.post<SignupForm>('/signup', newSignup);
   }
   postUserForgot(newForgot: ForgotForm):Observable<ForgotForm>{
-    return this.http.post<ForgotForm>(`${this.dbUrl}/forgot`, newForgot);/**3.arg httpOptions*/
+    return this.http.post<ForgotForm>('/forgot', newForgot);
   }
-  
+
 }
