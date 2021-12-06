@@ -1,5 +1,7 @@
 package server;
 
+import server.services.UserService;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -19,6 +21,7 @@ final public class Server {
     public static void start(int port, String publicHtmlDir, int cacheAliveSeconds) {
         try {
             Server server = new Server(port, publicHtmlDir, cacheAliveSeconds);
+            UserService.load();
             server.runServer();
         } catch (IOException e)
         {
@@ -27,16 +30,14 @@ final public class Server {
     }
 
     private final int port;
-    private final Path publicHtmlDir;
-    public static Map<String, ByteBuffer> responseBuffers;
+    // public static final String publicHtmlDir;
     private final int maxCacheAliveTime;
 
 
     private Server(int port, String publicHtmlDir, int cacheAliveSeconds) throws IOException {
         this.port = port;
-        this.publicHtmlDir = Paths.get(publicHtmlDir);
+        // Router.publicHtmlDir = publicHtmlDir;
         this.maxCacheAliveTime = cacheAliveSeconds * 1000;
-        this.fillLocalCache();
     }
 
     private void runServer() throws IOException {
@@ -57,7 +58,7 @@ final public class Server {
             while (true) {
                 if (clients == 0 && System.currentTimeMillis() - lastCacheUpdateTime >= this.maxCacheAliveTime) {
                     System.out.println("Updating server cache...");
-                    this.fillLocalCache();
+                    //responseBuffers.fillLocalCache();
                     lastCacheUpdateTime = System.currentTimeMillis();
                 }
 
@@ -109,7 +110,7 @@ final public class Server {
             key.attach(buf);
         }
 
-        System.out.println("Reading from client...");
+        System.out.println("Reading from client: " + client.getRemoteAddress());
         client.read(buf);
 
         String maybeCompleteRequest = new String(buf.array(), 0, buf.position());
@@ -135,44 +136,5 @@ final public class Server {
         return false;
     }
 
-    private void fillLocalCache() throws IOException {
-        this.responseBuffers = new HashMap<>();
 
-
-        for (Path p : Files.newDirectoryStream(this.publicHtmlDir)) {
-            if (Files.isRegularFile(p)) {
-                FileInfo fi = FileInfo.get(p, StandardCharsets.UTF_8);
-                ByteBuffer responseBuffer = this.createResponseBuffer(fi);
-                this.responseBuffers.put(p.getFileName().toString(), responseBuffer);
-            }
-        }
-
-        // Create a special buffer to use when requested file is not found
-        ByteBuffer nfBuffer = this.createNotFoundBuffer();
-        this.responseBuffers.put("404", nfBuffer);
-    }
-
-    private ByteBuffer createResponseBuffer(FileInfo fi) {
-        ByteBuffer data = fi.getData();
-        String header = "HTTP/1.0 200 OK\r\n"
-                + "Server: DestSoulsServer v1.0\r\n"
-                + "Content-length: " + data.limit() + "\r\n"
-                + "Content-type: " + fi.getMIMEType() + "\r\n\r\n";
-        byte[] headerData = header.getBytes(fi.getEncoding());
-        ByteBuffer buf = ByteBuffer.allocate(headerData.length + data.limit());
-        buf.put(headerData);
-        buf.put(data);
-        buf.flip();
-        return buf;
-    }
-
-    private ByteBuffer createNotFoundBuffer() {
-        String nfHeader = "HTTP/1.0 404 Not found\r\n"
-                + "Server: SimpleHTTP v1.0\r\n\r\n";
-        byte[] nfHeaderData = nfHeader.getBytes(StandardCharsets.UTF_8);
-        ByteBuffer nfBuffer = ByteBuffer.allocate(nfHeaderData.length);
-        nfBuffer.put(nfHeaderData);
-        nfBuffer.flip();
-        return nfBuffer;
-    }
 }
