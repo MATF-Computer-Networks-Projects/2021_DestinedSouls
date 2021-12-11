@@ -1,4 +1,4 @@
-package server.models;
+package server.models.users;
 
 public class Genders {
     private Genders() {}

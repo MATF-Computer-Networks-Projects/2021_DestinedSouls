@@ -11,21 +11,13 @@ export class AuthGuardService implements CanActivate {
               private authService: AuthenticationService) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-        //const currentUser = this.authService.currentUserValue;
-        if (this.authService.currentUserValue) {
-          // If user is already logged in he is automaticly redirected to courses page          
-          if(route.routeConfig) {
-            console.log(route.routeConfig.path);            
-            if (route.routeConfig.path === '') {
-              this.router.navigateByUrl('/courses');
-            }
-          }
-          return true;
-        }
-          else{            
-            
-            this.router.navigate(['/login'], {queryParams: { returnUrl: state.url }});
-            return false;
-        }
+    const currentUser = this.authService.currentUserValue;
+    // If user is already logged in he is automatically redirected to home page
+    if (currentUser)
+      return true;
+    else {
+      this.router.navigateByUrl('login');
+      return false;
+    }
   }
 }

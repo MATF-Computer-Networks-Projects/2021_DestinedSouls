@@ -126,9 +126,9 @@ final public class Router {
         String pass = null;
         if(matcher.find()) {
             email = matcher.group(1);
-            System.out.print("Parsed:  email : " + email);
+            // System.out.print("Parsed:  email : " + email);
             pass = matcher.group(2);
-            System.out.print(", pass : " + pass + '\n');
+            // System.out.print(", pass : " + pass + '\n');
         }
         else {
             return null;

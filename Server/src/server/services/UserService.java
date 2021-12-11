@@ -1,49 +1,39 @@
 package server.services;
 
-import server.models.User;
+import server.middleware.Authorizer;
+import server.models.users.User;
+import server.models.users.UserTable;
 
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.function.Predicate;
 
-/*
-{{1, new User( "Aleksa",
-                           "2021-11-08",
-                           "1",
-                           "2",
-                           "forsaken.veselic@gmail.com",
-                           "123"
-                        )
-            }};
-*/
-
 public class UserService {
-    private static Set<User> inMemUserTable = new HashSet();
+    private static UserTable inMemUserTable = new UserTable();
 
     public static void load() {
+        try {
+            Authorizer.load("SHA-256", "34dc0dcf-b1c6-4a2d-a639-4e513387d067"); // TODO: Load from config
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
         inMemUserTable.add(new User("Aleksa",
                                 "2021-11-08",
                                 "1",
                                 "2",
                                 "forsaken.veselic@gmail.com",
-                                "123"
+                                "000000"
                                     )
         );
     }
 
     public static User getById(int id) {
-        for(User user : inMemUserTable) {
-            if(user.id == id)
-                return user;
-        }
-        return null;
+        return inMemUserTable.getById(id);
     }
 
     private static User getIf(Predicate<User> p){
-        for(User user : inMemUserTable) {
+        for(User user : inMemUserTable.getAll()) {
             if(p.test(user))
                 return user;
         }
@@ -72,14 +62,8 @@ public class UserService {
             return null;
         }
 
-        try {
-            byte[] hashpass = MessageDigest.getInstance("SHA-256").digest(reqPassword.getBytes(StandardCharsets.UTF_8));
-
-            if(Arrays.hashCode(hashpass) == Arrays.hashCode(user.hash))
-                return omitHash(user);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        if(Arrays.hashCode(Authorizer.encrypt(reqPassword)) == Arrays.hashCode(user.hash))
+            return omitHash(user);
 
         return "";
     }

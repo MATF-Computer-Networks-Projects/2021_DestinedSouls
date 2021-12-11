@@ -1,12 +1,9 @@
-package server.models;
+package server.models.users;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import server.middleware.Authorizer;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class User {
@@ -34,8 +31,9 @@ public class User {
         try {
             this.gender   = Genders.fromString(gender);
             this.interest = Genders.fromString(interest);
-            this.hash = MessageDigest.getInstance("SHA-256").digest(password.getBytes(StandardCharsets.UTF_8));
-        } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
+            this.hash = Authorizer.encrypt(password);
+            //this.hash = MessageDigest.getInstance("SHA-256").digest(password.getBytes(StandardCharsets.UTF_8));
+        } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
             e.printStackTrace();
         }

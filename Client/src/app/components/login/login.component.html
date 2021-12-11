@@ -1,14 +1,16 @@
 <div class="app-form">
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">        
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <input type="email" name="email" id="email-login-input" class="input" placeholder="Enter email" formControlName="email"  [ngClass]="{ 'is-invalid': submitted && getCtrls.email.errors }" />
         <div *ngIf="submitted && getCtrls.email.errors" class="invalid-feedback">
             <div class="error" *ngIf="getCtrls.email.errors.required">Enter email</div>
             <div class="error" *ngIf="getCtrls.email.errors.email">Enter valid email</div>
-        </div>        
+        </div>
         <input type="password" name="password" id="password-login-input" class="input" placeholder="Enter password" formControlName="password" [ngClass]="{ 'is-invalid': submitted && getCtrls.password.errors }" />
         <div *ngIf="submitted && getCtrls.password.errors" class="invalid-feedback">
             <div class="error" formControlName="errMsg" *ngIf="getCtrls.password.errors.required">Enter password</div>
-
+        </div>
+        <div *ngIf="failed">
+          <div class="error">Wrong username or password</div>
         </div>
         <input  type="submit" value="Login" class="btn-primary" style="background-color:#00af2e;" >
         <input  type="button" (click)="onSignup()" value="Sign up" class="btn-primary" style="background-color:#af0029;" >
