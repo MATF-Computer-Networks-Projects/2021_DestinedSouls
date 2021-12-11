@@ -1,5 +1,7 @@
 package server;
 
+import server.routes.ResourceController;
+import server.routes.RouteController;
 import server.routes.UserController;
 import server.services.UserService;
 import server.utils.FileInfo;
@@ -7,6 +9,7 @@ import server.utils.Parsers;
 import server.utils.Response;
 import server.utils.Responses;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.charset.StandardCharsets;
@@ -20,109 +23,53 @@ final public class Router {
 
     public static void httpRequestHandle(SelectionKey key, String req)
     {
+        Response res = null;
+        String[] reqComps = req.split(" ", 3);
+        String url = reqComps[1].substring(1);
+        System.out.println("Url: " + url);
         if (req.endsWith("\r\n\r\n")) {
-            String httpMethod = req
-                    .codePoints()
-                    .takeWhile(c -> c > 32 && c < 127)
-                    .collect(StringBuilder::new,
-                            StringBuilder::appendCodePoint,
-                            StringBuilder::append)
-                    .toString()
-                    ;
-            String url = req.substring(httpMethod.length()+2,
-                                       req.indexOf(' ', httpMethod.length()+1)
-                                      );
-
-
-
-            if(httpMethod.equals("GET"))
-                get(key, url);
-
-
-        }
-
-        else {
-            if(req.startsWith("POST"))
-                post( key,
-                      req.substring(req.indexOf(' ')+1, req.indexOf(' ', 6)),
-                      req.substring(req.lastIndexOf('\n')+1)
-                );
-
-            else {
-                key.attach(responseBuffers.get("501").duplicate());
-                key.interestOps(SelectionKey.OP_WRITE);
-            }
-
-        }
-    }
-
-    public static void get(SelectionKey key, String url)
-    {
-        System.out.println("Server received request for route: \"" + url + '\"');
-        if(url.isEmpty())
-            url = "index.html";
-
-        if(FileInfo.isValid(url)) {
-            // Get the response buffer
-            if (responseBuffers.contains(url))
-                key.attach(responseBuffers.get(url).duplicate());
-            else
-                key.attach(responseBuffers.get("404").duplicate());
-        }
-        else {
-            Response res = UserController.get(url);
-            if(res.status == 200)
-                key.attach( responseBuffers.createResponseBuffer(
-                                FileInfo.json(StandardCharsets.UTF_8,
-                                        res.json.getBytes(StandardCharsets.UTF_8))
-                        )
-                );
-            else {
-                System.out.println("Failed post: code " + res.status);
-                key.attach( responseBuffers.get(Integer.toString(res.status)).duplicate() );
+            // Methods without body
+            switch (reqComps[0]) {
+                case "GET": { res = RouteController.get(url); break; }
+                case "HEAD": {  res = ResourceController.get(url);
+                                writeToKey(key, res.status == 200 ? responseBuffers.createHeaderOnlyBuf(res.json)
+                                                                : responseBuffers.get(res.json).duplicate());
+                                return;
+                             }
+                case "OPTIONS": { writeToKey(key, responseBuffers.get("204").duplicate()); return; }
+                default: { writeToKey(key, responseBuffers.get("501").duplicate()); return; }
             }
         }
 
-        // Change mode to write - now we will send response to this client
-        key.interestOps(SelectionKey.OP_WRITE);
+        else {
+            String body = reqComps[2].substring(reqComps[2].lastIndexOf('\n')+1);
+            switch (reqComps[0]) {
+                // Methods with body
+                case "POST": { res = RouteController.post( url, body); break; }
+                case "PUT":
+                case "PATCH":
+                default: { writeToKey(key, responseBuffers.get("501").duplicate()); return; }
+            }
+        }
+        writeToKey(key, res);
     }
 
-    public static void post(SelectionKey key, String route, String data) {
-        System.out.println("Server received request route: \"" + route + '\"');
-        System.out.println("Data: \"" + data + '\"');
 
-        Response res = UserController.post(route, data);
+    private static void writeToKey(SelectionKey key, Response res) {
         if(res.status == 200) {
+            writeToKey(key, res.json.startsWith("{")
+                    ? responseBuffers.createResponseBuffer( FileInfo.json(res.json.getBytes(StandardCharsets.UTF_8)) )
+                    : responseBuffers.get(res.json).duplicate() );
+            return;
+        }
 
-            System.out.println("User logged: " + res.json);
-            key.attach( responseBuffers.createResponseBuffer(
-                                    FileInfo.json(StandardCharsets.UTF_8,
-                                    res.json.getBytes(StandardCharsets.UTF_8))
-                                    )
-                        );
-        }
-        else {
-            System.out.println("Failed post: code " + res.status);
-            key.attach( responseBuffers.get(Integer.toString(res.status)).duplicate() );
-        }
+        writeToKey(key, responseBuffers.get(Integer.toString(res.status)).duplicate());
+    }
+
+    private static void writeToKey(SelectionKey key, ByteBuffer buffer) {
+        key.attach(buffer);
         key.interestOps(SelectionKey.OP_WRITE);
     }
 
-    /*
-    private static String authenticate(String data) {
-        Matcher matcher = Parsers.loginPattern.matcher(data);
-        String email = null;
-        String pass = null;
-        if(matcher.find()) {
-            email = matcher.group(1);
-            // System.out.print("Parsed:  email : " + email);
-            pass = matcher.group(2);
-            // System.out.print(", pass : " + pass + '\n');
-        }
-        else {
-            return null;
-        }
-        return UserService.authenticate(email, pass);
-    }
-     */
+
 }

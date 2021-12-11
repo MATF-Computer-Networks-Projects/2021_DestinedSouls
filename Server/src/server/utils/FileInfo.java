@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -26,16 +27,36 @@ public final class FileInfo {
         }
     }
 
+    public static String getFilename(String filepath) {
+        if(filepath.isEmpty())
+            return "index.html";
+        return Paths.get(Server.PUBLIC_HTML_DIR, filepath).getFileName().toString();
+    }
+
+    public static long getSize(String file) {
+        try {
+            return Files.size(Paths.get(Server.PUBLIC_HTML_DIR, file));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
     public static boolean isValid(String path) {
         try {
-            return Files.isRegularFile(Paths.get(Server.PUBLIC_HTML_DIR, path));
-        } catch (InvalidPathException e) {
+            return Files.probeContentType(Paths.get(Server.PUBLIC_HTML_DIR, path.isEmpty() ? "index.html" : path)) != null;
+        } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
     }
 
     public static FileInfo json(Charset encoding, byte[] data) {
         return new FileInfo("application/json", encoding, ByteBuffer.wrap(data));
+    }
+
+    public static FileInfo json(byte[] data) {
+        return new FileInfo("application/json", StandardCharsets.UTF_8, ByteBuffer.wrap(data));
     }
 
     private final String MIMEType;
@@ -50,15 +71,15 @@ public final class FileInfo {
     }
 
 
-    String getMIMEType() {
+    public String getMIMEType() {
         return this.MIMEType;
     }
 
-    Charset getEncoding() {
+    public Charset getEncoding() {
         return this.encoding;
     }
 
-    ByteBuffer getData() {
+    public ByteBuffer getData() {
         return this.data;
     }
 }

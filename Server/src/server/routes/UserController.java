@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class UserController {
     public static Response get(String url) {
+        System.out.println("User controller " + url);
         switch (url) {
             case "":
             case "/": return null;
@@ -20,13 +21,14 @@ public class UserController {
 
     public static Response post(String url, String data) {
         Json reqBody = new Json(data);
+        System.out.println("User controller: " + url + "\r\n" + reqBody);
 
         switch (url) {
-            case "/users/authenticate": return UserService.authenticate(
+            case "authenticate": return UserService.authenticate(
                                                     reqBody.get("email"),
                                                     reqBody.get("password")
                                                 );
-            case "/users/register": return new Response(501, null);
+            case "register": return new Response(501, null);
             default: return new Response(404, null);
         }
     }
