@@ -3,6 +3,7 @@ package server.services;
 import server.middleware.Authorizer;
 import server.models.users.User;
 import server.models.users.UserTable;
+import server.utils.Json;
 import server.utils.Response;
 
 import java.security.NoSuchAlgorithmException;
@@ -74,5 +75,15 @@ public class UserService {
             return new Response(200, omitHash(user));
 
         return new Response(401, null);
+    }
+
+
+    public static Response register(Json user) {
+        if(getIf(user1 -> user1.email.equals(user.get("email"))) != null)
+            return new Response(403, null);
+        User newUser = new User(user.get("name"), user.get("birthday"), user.get("gender"),
+                                user.get("interest"), user.get("email"), user.get("password"));
+        inMemUserTable.add(newUser);
+        return new Response(200, omitHash(newUser));
     }
 }

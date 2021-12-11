@@ -43,6 +43,7 @@ public final class Responses {
         this.responseBuffers.put("/", this.responseBuffers.get("index.html"));
         this.responseBuffers.put("204", this.createNoContent());
         this.responseBuffers.put("401", this.createUnauthorizedBuffer());
+        this.responseBuffers.put("403", this.createForbidden());
         this.responseBuffers.put("404", this.createNotFoundBuffer());
         this.responseBuffers.put("501", this.createNotImplementedBuffer());
     }
@@ -81,6 +82,21 @@ public final class Responses {
         return buf;
     }
 
+    public ByteBuffer createBadRequest(String msg) {
+        byte[] nfHeaderData = ("HTTP/1.1 400 Bad Request\r\nServer: DestSoulsServer v1.0\r\n\r\n")
+                .getBytes(StandardCharsets.UTF_8);
+        if(msg.startsWith("\"msg\":"))
+                msg = "{" + msg + "}";
+        else if(!msg.startsWith("{"))
+            msg = "{\"msg\":\"" + msg + "\"}";
+        byte[] bMsg = msg.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer buf = ByteBuffer.allocate(nfHeaderData.length + bMsg.length);
+        buf.put(nfHeaderData);
+        buf.put(bMsg);
+        buf.flip();
+        return buf;
+    }
+
     public ByteBuffer createUnauthorizedBuffer() {
         String uHeader = "HTTP/1.1 401 Unauthorized\r\n"
                 + "Server: DestSoulsServer v1.0\r\n\r\n";
@@ -89,6 +105,15 @@ public final class Responses {
         bufHeader.put(nfHeaderData);
         bufHeader.flip();
         return bufHeader;
+    }
+
+    public ByteBuffer createForbidden() {
+        byte[] nfHeaderData = ("HTTP/1.1 403 Forbidden\r\nServer: DestSoulsServer v1.0\r\n\r\n")
+                .getBytes(StandardCharsets.UTF_8);
+        ByteBuffer buf = ByteBuffer.allocate(nfHeaderData.length);
+        buf.put(nfHeaderData);
+        buf.flip();
+        return buf;
     }
 
     public ByteBuffer createNotFoundBuffer() {

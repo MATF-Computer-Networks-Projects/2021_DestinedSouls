@@ -51,6 +51,7 @@ final public class Router {
                 default: { writeToKey(key, responseBuffers.get("501").duplicate()); return; }
             }
         }
+        System.out.println("Final res: " + res.status + " " + res.json);
         writeToKey(key, res);
     }
 
@@ -60,6 +61,10 @@ final public class Router {
             writeToKey(key, res.json.startsWith("{")
                     ? responseBuffers.createResponseBuffer( FileInfo.json(res.json.getBytes(StandardCharsets.UTF_8)) )
                     : responseBuffers.get(res.json).duplicate() );
+            return;
+        }
+        else if(res.status == 400) {
+            writeToKey(key, responseBuffers.createBadRequest(res.json));
             return;
         }
 

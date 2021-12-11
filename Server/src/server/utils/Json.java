@@ -28,6 +28,8 @@ public class Json {
         return jsonObj.put(key, value);
     }
 
+    public boolean hasKey(String key) { return jsonObj.containsKey(key); }
+
     public static Json parseJSON(String data) {
         return new Json(data);
     }
