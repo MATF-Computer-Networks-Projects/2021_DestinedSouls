@@ -7,10 +7,10 @@
             <div class="error" *ngIf="getCtrls.name.errors.required">Enter name</div>
             <div class="error" *ngIf="getCtrls.name.errors.email">Enter valid name</div>
         </div>
-        <input name="birthdate" class="input" type="date" style="margin-bottom: 5px;" formControlName="birthdate" [ngClass]="{ 'is-invalid': submitted && getCtrls.birthdate.errors }">
-        <div *ngIf="submitted && getCtrls.birthdate.errors" class="invalid-feedback">
-            <div class="error" *ngIf="getCtrls.birthdate.errors.required">Enter birthdate</div>
-            <div class="error" *ngIf="getCtrls.birthdate.errors.email">Enter valid birthdate</div>
+        <input name="birthday" class="input" type="date" style="margin-bottom: 5px;" formControlName="birthday" [ngClass]="{ 'is-invalid': submitted && getCtrls.birthday.errors }">
+        <div *ngIf="submitted && getCtrls.birthday.errors" class="invalid-feedback">
+            <div class="error" *ngIf="getCtrls.birthday.errors.required">Enter birthday</div>
+            <div class="error" *ngIf="getCtrls.birthday.errors.email">Enter valid birthday</div>
         </div>
         <!--TODO: fix first option, [(ngModel)]="gender" hides it-->
         <select name="gender" class="input" style="margin-bottom: 5px;" formControlName="gender">
@@ -36,6 +36,9 @@
         <div *ngIf="submitted && getCtrls.password.errors" class="invalid-feedback">
             <div class="error" *ngIf="getCtrls.email.errors.required">Enter password</div>
             <div class="error" *ngIf="getCtrls.email.errors.email">Enter valid password</div>
+        </div>
+        <div *ngIf="failed">
+          <div id="errorMsg" class="error"></div>
         </div>
         <!--<input name="phone" class="input" type="tel" placeholder="Phone number" [(ngModel)]="phone">-->
         <input  type="submit" value="Sign up!" class="btn btn-primary btn-block" style="margin-top: 35px; background-color: rgb(199,146,238);" >

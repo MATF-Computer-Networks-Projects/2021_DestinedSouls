@@ -1,5 +1,11 @@
 package server.middleware;
 
+import server.Router;
+import server.models.users.User;
+import server.services.UserService;
+import server.utils.Json;
+import server.utils.Parsers;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -8,6 +14,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Base64;
 
 public class Authorizer {
     private static Cipher encryptor = null;
@@ -74,5 +83,44 @@ public class Authorizer {
 
     public static String decrypt(byte[] hash) throws IllegalBlockSizeException, BadPaddingException {
         return new String(decryptor.doFinal(hash), StandardCharsets.UTF_8);
+    }
+
+    public static String token(int id) {
+        Json json = new Json();
+        json.put("sub", Integer.toString(id));
+        json.put("date", Long.toString(System.currentTimeMillis()));
+        return token(json);
+    }
+
+    public static String token(Json json) {
+        return Base64.getEncoder().encodeToString(encrypt(json.toString()));
+    }
+
+    public static User authorize(String request) {
+        String token = Parsers.parseToken(request);
+        if(token == null)
+            return null;
+        Json user = new Json(parseToken(token));
+        if(user == null) {
+            return null;
+        }
+        System.err.println("User: " + user);
+        int id = Integer.decode(user.get("sub"));
+        System.err.println("User: " + id);
+        if(user.hasKey("date") && ((System.currentTimeMillis() - Long.decode(user.get("date"))) <= 360000000) )
+            return UserService.getById( id );
+        return null;
+    }
+
+    public static String parseToken(String token) {
+
+        try {
+            return Authorizer.decrypt(Base64.getDecoder().decode(token));
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

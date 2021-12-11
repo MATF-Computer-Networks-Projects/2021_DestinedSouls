@@ -1,138 +1,92 @@
 package server;
 
+import server.middleware.Authorizer;
+import server.models.users.User;
+import server.routes.ResourceController;
+import server.routes.RouteController;
+import server.routes.UserController;
 import server.services.UserService;
-import server.utils.Parsers;
+import server.utils.*;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 final public class Router {
-    public static Response responseBuffers = new Response("Client/dist/client");
+
+    public static Responses responseBuffers = new Responses(Server.PUBLIC_HTML_DIR);
 
     public static void httpRequestHandle(SelectionKey key, String req)
     {
+
+        Response res = null;
+        String[] reqComps = req.split(" ", 3);
+        String url = reqComps[1].substring(1);
+        System.out.println("Url: " + url);
+
+
+
         if (req.endsWith("\r\n\r\n")) {
-            // Showing some functional concepts with collect() method,
-            // this can be done easily using substring() method
-            String httpMethod = req
-                    .codePoints()
-                    .takeWhile(c -> c > 32 && c < 127)
-                    .collect(StringBuilder::new,
-                            StringBuilder::appendCodePoint,
-                            StringBuilder::append)
-                    .toString()
-                    ;
-            String filename = req.substring(httpMethod.length()+1)
-                    .codePoints()
-                    .takeWhile(c -> c > 32 && c < 127)
-                    .collect(StringBuilder::new,
-                            StringBuilder::appendCodePoint,
-                            StringBuilder::append)
-                    .toString()
-                    ;
+            // Methods without body
+            User user = Authorizer.authorize(reqComps[2]);
 
-            if(filename.equals("/"))
-                filename = "index.html";
-            else if(filename.startsWith("/"))
-                filename = filename.substring(1);
-
-            if(httpMethod.equals("GET"))
-                get(key, filename);
-
-
+                // body.put("id", Integer.toString(user.id));
+            switch (reqComps[0]) {
+                case "GET": { res = RouteController.get(url, user != null ? user.id : null); break; }
+                case "HEAD": {  res = ResourceController.get(url);
+                                writeToKey(key, res.status == 200 ? responseBuffers.createHeaderOnlyBuf(res.json)
+                                                                : responseBuffers.get(res.json).duplicate());
+                                return;
+                             }
+                case "OPTIONS": { writeToKey(key, responseBuffers.get("204").duplicate()); return; }
+                default: { writeToKey(key, responseBuffers.get("501").duplicate()); return; }
+            }
         }
 
         else {
-            if(req.startsWith("POST"))
-                post( key,
-                      req.substring(req.indexOf(' ')+1, req.indexOf(' ', 6)),
-                      req.substring(req.lastIndexOf('\n')+1)
-                );
-
-            else {
-                key.attach(responseBuffers.get("501").duplicate());
-                key.interestOps(SelectionKey.OP_WRITE);
-            }
-
-        }
-    }
-
-    public static void get(SelectionKey key, String filename)
-    {
-        System.out.println("Server received request for file: \"" + filename + '\"');
-        // Get the response buffer
-        if (responseBuffers.contains(filename))
-            key.attach(responseBuffers.get(filename).duplicate());
-        else
-            key.attach(responseBuffers.get("404").duplicate());
-
-        // Change mode to write - now we will send response to this client
-        key.interestOps(SelectionKey.OP_WRITE);
-    }
-
-    public static void post(SelectionKey key, String route, String data) {
-        System.out.println("Server received request route: \"" + route + '\"');
-        System.out.println("Data: \"" + data + '\"');
-
-
-        String res = null;
-        switch (route) {
-            case "/users/authenticate": {
-                res = authenticate(data);
-                break;
-            }
-            case "/users/register": {
-                key.attach(responseBuffers.get("501").duplicate());
-                key.interestOps(SelectionKey.OP_WRITE);
-                return;
-            }
-            default: {
-                key.attach(responseBuffers.get("404").duplicate());
-                key.interestOps(SelectionKey.OP_WRITE);
-                return;
+            Json body = new Json(reqComps[2].substring(reqComps[2].lastIndexOf('\n')+1));
+            User user = Authorizer.authorize(reqComps[2]);
+            if(user != null)
+                body.put("id", Integer.toString(user.id));
+            switch (reqComps[0]) {
+                // Methods with body
+                case "POST": { res = RouteController.post( url, body); break; }
+                case "PUT":
+                case "PATCH":
+                default: { writeToKey(key, responseBuffers.get("501").duplicate()); return; }
             }
         }
+        System.out.println("Final res: " + res.status + " " + res.json);
+        writeToKey(key, res);
+    }
 
-        if(res == null) {
-            key.attach(responseBuffers.get("404").duplicate());
-            key.interestOps(SelectionKey.OP_WRITE);
+
+    private static void writeToKey(SelectionKey key, Response res) {
+        if(res.status == 200) {
+            writeToKey(key, res.json.startsWith("{") || res.json.startsWith("[")
+                    ? responseBuffers.createResponseBuffer( FileInfo.json(res.json.getBytes(StandardCharsets.UTF_8)) )
+                    : responseBuffers.get(res.json).duplicate() );
+            return;
+        }
+        else if(res.status == 400) {
+            writeToKey(key, responseBuffers.createBadRequest(res.json));
             return;
         }
 
-        if(res == "") {
-            key.attach(responseBuffers.get("401").duplicate());
-            key.interestOps(SelectionKey.OP_WRITE);
-            return;
-        }
+        writeToKey(key, responseBuffers.get(Integer.toString(res.status)).duplicate());
+    }
 
-
-        res = "{" + res + "}";
-        System.out.println("User logged: " + res);
-
-        ByteBuffer buf = responseBuffers.createResponseBuffer(FileInfo.json(StandardCharsets.UTF_8,
-                                                              res.getBytes(StandardCharsets.UTF_8)));
-
-        key.attach(buf.duplicate());
+    private static void writeToKey(SelectionKey key, ByteBuffer buffer) {
+        key.attach(buffer);
         key.interestOps(SelectionKey.OP_WRITE);
     }
 
-    private static String authenticate(String data) {
-        Matcher matcher = Parsers.loginPattern.matcher(data);
-        String email = null;
-        String pass = null;
-        if(matcher.find()) {
-            email = matcher.group(1);
-            // System.out.print("Parsed:  email : " + email);
-            pass = matcher.group(2);
-            // System.out.print(", pass : " + pass + '\n');
-        }
-        else {
-            return null;
-        }
-        return UserService.authenticate(email, pass);
-    }
+
 }

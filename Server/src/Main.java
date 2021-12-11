@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         
         if(Arrays.asList(args).contains("--development"))
-            PUBLIC_HTML_DIR = "Client/dist/client";
+            Server.PUBLIC_HTML_DIR = "Client/dist/client";
 
         Server.start(PORT, PUBLIC_HTML_DIR, CACHE_TIMEOUT);
     }

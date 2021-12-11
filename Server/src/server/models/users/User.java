@@ -4,6 +4,7 @@ import server.middleware.Authorizer;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 public class User {
@@ -70,4 +71,15 @@ public class User {
         );
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":\"" + id + "\"" +
+                ",\"name\":\"" + name + "\"" +
+                ",\"birthday\":\"" + birthday + "\"" +
+                ",\"gender\":\"" + gender + "\"" +
+                ",\"interest\":\"" + interest + "\"" +
+                ",\"email\":\"" + email  + "\"" +
+                '}';
+    }
 }

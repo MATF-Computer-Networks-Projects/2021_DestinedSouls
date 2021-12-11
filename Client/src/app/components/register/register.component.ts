@@ -13,21 +13,22 @@ export class RegisterComponent implements OnInit {
   signupForm: FormGroup;
   loading = false;
   submitted = false;
+  failed = false;
   returnUrl: string = "/";
 
   constructor(private formBuilder: FormBuilder,
               private route: ActivatedRoute,
               private router: Router,
-              private userService: UserService) { 
+              private userService: UserService) {
 
-                
+
 
               }
 
-  ngOnInit(): void {    
+  ngOnInit(): void {
     this.signupForm = this.formBuilder.group({
       name: ['', Validators.required],
-      birthdate: ['', Validators.required],
+      birthday: ['', Validators.required],
       gender: ['', Validators.required],
       interest: ['', Validators.required],
       email: ['', [Validators.required,Validators.email]],
@@ -38,16 +39,30 @@ export class RegisterComponent implements OnInit {
   get getCtrls() { return this.signupForm.controls; }
 
   onSubmit() {
-    this.submitted = true;    
+    this.submitted = true;
 
     // stop here if form is invalid
     if (this.signupForm.invalid) {
-      console.log("Invalid form.")      
+      console.log("Invalid form.")
         return;
     }
 
     this.loading = true;
-    this.userService.register(this.signupForm.value)        
+    this.failed = false;
+    this.userService.register(this.signupForm.value)
+      .pipe()
+      .subscribe(
+        data => {
+          // this.alertService.success('Registration successful', true);
+          this.router.navigate(['/login']);
+        },
+        error => {
+          document.getElementById("errorMsg").innerText = error.stringify();
+          this.loading = false;
+          this.submitted = false;
+          this.failed = true;
+        });
+    /*
         .subscribe(
             data => {
                 this.router.navigate(['/login']);
@@ -55,6 +70,7 @@ export class RegisterComponent implements OnInit {
             error => {
                 this.loading = false;
             });
+     */
   }
 
   onLogin() {
