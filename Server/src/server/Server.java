@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 final public class Server {
+    public static String PUBLIC_HTML_DIR = "public_html";
     public static void start(int port, String publicHtmlDir, int cacheAliveSeconds) {
         try {
             Server server = new Server(port, publicHtmlDir, cacheAliveSeconds);

@@ -1,23 +1,26 @@
 package server;
 
+import server.routes.UserController;
 import server.services.UserService;
+import server.utils.FileInfo;
 import server.utils.Parsers;
+import server.utils.Response;
+import server.utils.Responses;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 final public class Router {
-    public static Response responseBuffers = new Response("Client/dist/client");
+
+    public static Responses responseBuffers = new Responses(Server.PUBLIC_HTML_DIR);
 
     public static void httpRequestHandle(SelectionKey key, String req)
     {
         if (req.endsWith("\r\n\r\n")) {
-            // Showing some functional concepts with collect() method,
-            // this can be done easily using substring() method
             String httpMethod = req
                     .codePoints()
                     .takeWhile(c -> c > 32 && c < 127)
@@ -26,22 +29,14 @@ final public class Router {
                             StringBuilder::append)
                     .toString()
                     ;
-            String filename = req.substring(httpMethod.length()+1)
-                    .codePoints()
-                    .takeWhile(c -> c > 32 && c < 127)
-                    .collect(StringBuilder::new,
-                            StringBuilder::appendCodePoint,
-                            StringBuilder::append)
-                    .toString()
-                    ;
+            String url = req.substring(httpMethod.length()+2,
+                                       req.indexOf(' ', httpMethod.length()+1)
+                                      );
 
-            if(filename.equals("/"))
-                filename = "index.html";
-            else if(filename.startsWith("/"))
-                filename = filename.substring(1);
+
 
             if(httpMethod.equals("GET"))
-                get(key, filename);
+                get(key, url);
 
 
         }
@@ -61,14 +56,32 @@ final public class Router {
         }
     }
 
-    public static void get(SelectionKey key, String filename)
+    public static void get(SelectionKey key, String url)
     {
-        System.out.println("Server received request for file: \"" + filename + '\"');
-        // Get the response buffer
-        if (responseBuffers.contains(filename))
-            key.attach(responseBuffers.get(filename).duplicate());
-        else
-            key.attach(responseBuffers.get("404").duplicate());
+        System.out.println("Server received request for route: \"" + url + '\"');
+        if(url.isEmpty())
+            url = "index.html";
+
+        if(FileInfo.isValid(url)) {
+            // Get the response buffer
+            if (responseBuffers.contains(url))
+                key.attach(responseBuffers.get(url).duplicate());
+            else
+                key.attach(responseBuffers.get("404").duplicate());
+        }
+        else {
+            Response res = UserController.get(url);
+            if(res.status == 200)
+                key.attach( responseBuffers.createResponseBuffer(
+                                FileInfo.json(StandardCharsets.UTF_8,
+                                        res.json.getBytes(StandardCharsets.UTF_8))
+                        )
+                );
+            else {
+                System.out.println("Failed post: code " + res.status);
+                key.attach( responseBuffers.get(Integer.toString(res.status)).duplicate() );
+            }
+        }
 
         // Change mode to write - now we will send response to this client
         key.interestOps(SelectionKey.OP_WRITE);
@@ -78,48 +91,24 @@ final public class Router {
         System.out.println("Server received request route: \"" + route + '\"');
         System.out.println("Data: \"" + data + '\"');
 
+        Response res = UserController.post(route, data);
+        if(res.status == 200) {
 
-        String res = null;
-        switch (route) {
-            case "/users/authenticate": {
-                res = authenticate(data);
-                break;
-            }
-            case "/users/register": {
-                key.attach(responseBuffers.get("501").duplicate());
-                key.interestOps(SelectionKey.OP_WRITE);
-                return;
-            }
-            default: {
-                key.attach(responseBuffers.get("404").duplicate());
-                key.interestOps(SelectionKey.OP_WRITE);
-                return;
-            }
+            System.out.println("User logged: " + res.json);
+            key.attach( responseBuffers.createResponseBuffer(
+                                    FileInfo.json(StandardCharsets.UTF_8,
+                                    res.json.getBytes(StandardCharsets.UTF_8))
+                                    )
+                        );
         }
-
-        if(res == null) {
-            key.attach(responseBuffers.get("404").duplicate());
-            key.interestOps(SelectionKey.OP_WRITE);
-            return;
+        else {
+            System.out.println("Failed post: code " + res.status);
+            key.attach( responseBuffers.get(Integer.toString(res.status)).duplicate() );
         }
-
-        if(res == "") {
-            key.attach(responseBuffers.get("401").duplicate());
-            key.interestOps(SelectionKey.OP_WRITE);
-            return;
-        }
-
-
-        res = "{" + res + "}";
-        System.out.println("User logged: " + res);
-
-        ByteBuffer buf = responseBuffers.createResponseBuffer(FileInfo.json(StandardCharsets.UTF_8,
-                                                              res.getBytes(StandardCharsets.UTF_8)));
-
-        key.attach(buf.duplicate());
         key.interestOps(SelectionKey.OP_WRITE);
     }
 
+    /*
     private static String authenticate(String data) {
         Matcher matcher = Parsers.loginPattern.matcher(data);
         String email = null;
@@ -135,4 +124,5 @@ final public class Router {
         }
         return UserService.authenticate(email, pass);
     }
+     */
 }

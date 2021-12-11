@@ -1,4 +1,4 @@
-package server;
+package server.utils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -9,11 +9,11 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-final public class Response {
+public final class Responses {
     private Map<String, ByteBuffer> responseBuffers;
     private Path publicHtmlDir;
 
-    Response(String pathDir, Map<String, ByteBuffer> cache) {
+    public Responses(String pathDir, Map<String, ByteBuffer> cache) {
         this.responseBuffers = cache;
         this.publicHtmlDir = Paths.get(pathDir);
         try {
@@ -23,7 +23,7 @@ final public class Response {
         }
     }
 
-    Response(String pathDir) {
+    public Responses(String pathDir) {
         this(pathDir, new HashMap<>());
     }
 

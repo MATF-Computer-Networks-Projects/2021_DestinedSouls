@@ -1,4 +1,6 @@
-package server;
+package server.utils;
+
+import server.Server;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -6,9 +8,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
-final class FileInfo {
+public final class FileInfo {
 
     public static FileInfo get(Path path, Charset encoding) throws IOException {
         try (var fin = new FileInputStream(path.toString())){
@@ -19,6 +23,14 @@ final class FileInfo {
         } catch (IOException ex){
             ex.printStackTrace();
             throw ex;
+        }
+    }
+
+    public static boolean isValid(String path) {
+        try {
+            return Files.isRegularFile(Paths.get(Server.PUBLIC_HTML_DIR, path));
+        } catch (InvalidPathException e) {
+            return false;
         }
     }
 

@@ -3,6 +3,7 @@ package server.services;
 import server.middleware.Authorizer;
 import server.models.users.User;
 import server.models.users.UserTable;
+import server.utils.Response;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -13,7 +14,11 @@ public class UserService {
 
     public static void load() {
         try {
-            Authorizer.load("SHA-256", "34dc0dcf-b1c6-4a2d-a639-4e513387d067"); // TODO: Load from config
+            // TODO: Load from config
+            Authorizer.load(
+                    "SHA-256",
+                    "34dc0dcf-b1c6-4a2d-a639-4e513387d067"
+            );
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -41,13 +46,16 @@ public class UserService {
         return null;
     }
 
+    /*
+    * User as formatted json without password
+    */
     public static String omitHash(User user) {
-        return "\"id\":\"" + user.id + "\"," +
+        return "{\"id\":\"" + user.id + "\"," +
                 "\"name\":\"" + user.name + "\"," +
                 "\"email\":\"" + user.email + "\"," +
                 "\"birthday\":\"" + user.getBday() + "\"," +
                 "\"gender\":\"" + user.gender + "\"," +
-                "\"interest\":\"" + user.interest + "\"";
+                "\"interest\":\"" + user.interest + "\"}";
     }
 
     /*
@@ -55,16 +63,16 @@ public class UserService {
     * If user with provided email does not exist, null returned
     * If password is wrong empty string is returned
     */
-    public static String authenticate(String reqEmail, String reqPassword) {
+    public static Response authenticate(String reqEmail, String reqPassword) {
         User user = getIf(user1 -> user1.email.equals(reqEmail));
         if(user == null) {
             System.out.println("User does not exist");
-            return null;
+            return new Response(404,null);
         }
 
         if(Arrays.hashCode(Authorizer.encrypt(reqPassword)) == Arrays.hashCode(user.hash))
-            return omitHash(user);
+            return new Response(200, omitHash(user));
 
-        return "";
+        return new Response(401, null);
     }
 }
