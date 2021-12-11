@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router'
-import { AuthenticationService } from 'src/app/services'
+import {AuthenticationService, UserService} from 'src/app/services'
 
 @Component({
   selector: 'app-homepage',
@@ -10,6 +10,7 @@ import { AuthenticationService } from 'src/app/services'
 export class HomepageComponent implements OnInit {
 
   constructor(private authenticationService: AuthenticationService,
+              private userService: UserService,
               private router: Router) { }
 
   ngOnInit(): void {
@@ -18,5 +19,17 @@ export class HomepageComponent implements OnInit {
   onLogout() {
     this.authenticationService.logout();
     this.router.navigateByUrl('/login');
+  }
+
+  onGetAll() {
+    this.userService.getAll().subscribe(
+      data => {
+        console.log(`Data: ${data}`);
+      },
+      error => {
+        console.error(error);
+      });
+
+
   }
 }

@@ -14,4 +14,8 @@ export class UserService {
   register(user: User): Observable<User> {
     return this.http.post<User>('/users/register', user);
   }
+
+  getAll(): Observable<User[]> {
+    return this.http.get<User[]>('/users/getAll');
+  }
 }
