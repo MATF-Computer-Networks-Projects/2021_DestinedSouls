@@ -107,6 +107,7 @@ final public class Server {
         // we create a buffer for his request
         ByteBuffer buf = (ByteBuffer)key.attachment();
         if (buf == null) {
+
             buf = ByteBuffer.allocate(4096);
             key.attach(buf);
         }

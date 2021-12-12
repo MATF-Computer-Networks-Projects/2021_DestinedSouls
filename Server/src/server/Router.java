@@ -25,7 +25,7 @@ final public class Router {
 
     public static void httpRequestHandle(SelectionKey key, String req)
     {
-
+        // System.err.print(req);
         Response res = null;
         String[] reqComps = req.split(" ", 3);
         String url = reqComps[1].substring(1);
@@ -53,12 +53,17 @@ final public class Router {
         else {
             Json body = new Json(reqComps[2].substring(reqComps[2].lastIndexOf('\n')+1));
             User user = Authorizer.authorize(reqComps[2]);
-            if(user != null)
+            // String data = reqComps[2].substring(reqComps[2].lastIndexOf('\n')+1);
+            // String data = reqComps[2].substring(reqComps[2].indexOf("\r\n\r\n")+1);
+            String data = reqComps[2].substring(reqComps[2].indexOf("------Web"));
+            if(user != null) {
                 body.put("id", Integer.toString(user.id));
+                data = body.toString();
+            }
             switch (reqComps[0]) {
                 // Methods with body
-                case "POST": { res = RouteController.post( url, body); break; }
-                case "PUT":
+                case "POST": { res = RouteController.post( url, data ); break; }
+                case "PUT": { res = RouteController.post( url, data ); break; }
                 case "PATCH":
                 default: { writeToKey(key, responseBuffers.get("501").duplicate()); return; }
             }

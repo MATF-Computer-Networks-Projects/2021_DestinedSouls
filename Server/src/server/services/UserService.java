@@ -115,6 +115,6 @@ public class UserService {
             return new Response(403, null);
         User newUser = userFromJson(user);
         inMemUserTable.add(newUser);
-        return new Response(200, omitHash(newUser));
+        return new Response(200, "{" + omitHash(newUser) + "}");
     }
 }

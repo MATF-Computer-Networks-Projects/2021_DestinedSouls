@@ -9,7 +9,6 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -26,6 +25,8 @@ public final class FileInfo {
             throw ex;
         }
     }
+
+
 
     public static String getFilename(String filepath) {
         if(filepath.isEmpty())
