@@ -1,6 +1,8 @@
 package server.models.users;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserTable {
     private Map<Integer, User> inMemTable;

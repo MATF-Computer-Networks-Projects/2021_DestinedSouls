@@ -1,13 +1,15 @@
 package server.services;
 
-import server.middleware.Authorizer;
 import server.models.users.User;
 import server.models.users.UserTable;
+import server.security.Authorizer;
 import server.utils.Json;
 import server.utils.Response;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class UserService {
@@ -115,6 +117,6 @@ public class UserService {
             return new Response(403, null);
         User newUser = userFromJson(user);
         inMemUserTable.add(newUser);
-        return new Response(200, omitHash(newUser));
+        return new Response(200, "{" + omitHash(newUser) + "}");
     }
 }

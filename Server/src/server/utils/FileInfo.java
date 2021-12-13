@@ -1,7 +1,5 @@
 package server.utils;
 
-import server.Server;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -9,11 +7,14 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public final class FileInfo {
+
+    public final static String PUBLIC_HTML_DIR = System.getenv("PUBLIC_HTML") != null ?
+                                                                                System.getenv("PUBLIC_HTML")
+                                                                             :  "public_html";
 
     public static FileInfo get(Path path, Charset encoding) throws IOException {
         try (var fin = new FileInputStream(path.toString())){
@@ -27,15 +28,17 @@ public final class FileInfo {
         }
     }
 
+
+
     public static String getFilename(String filepath) {
         if(filepath.isEmpty())
             return "index.html";
-        return Paths.get(Server.PUBLIC_HTML_DIR, filepath).getFileName().toString();
+        return Paths.get(PUBLIC_HTML_DIR, filepath).getFileName().toString();
     }
 
     public static long getSize(String file) {
         try {
-            return Files.size(Paths.get(Server.PUBLIC_HTML_DIR, file));
+            return Files.size(Paths.get(PUBLIC_HTML_DIR, file));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -44,7 +47,7 @@ public final class FileInfo {
 
     public static boolean isValid(String path) {
         try {
-            return Files.probeContentType(Paths.get(Server.PUBLIC_HTML_DIR, path.isEmpty() ? "index.html" : path)) != null;
+            return Files.probeContentType(Paths.get(PUBLIC_HTML_DIR, path.isEmpty() ? "index.html" : path)) != null;
         } catch (IOException e) {
             e.printStackTrace();
             return false;

@@ -1,7 +1,5 @@
 package server.utils;
 
-import java.util.Map;
-
 public class Response {
     public int status;
     public String json;

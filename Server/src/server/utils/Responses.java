@@ -1,7 +1,5 @@
 package server.utils;
 
-import server.Server;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -45,6 +43,7 @@ public final class Responses {
         this.responseBuffers.put("401", this.createUnauthorizedBuffer());
         this.responseBuffers.put("403", this.createForbidden());
         this.responseBuffers.put("404", this.createNotFoundBuffer());
+        this.responseBuffers.put("405", this.createNotAllowed());
         this.responseBuffers.put("501", this.createNotImplementedBuffer());
     }
 
@@ -66,7 +65,7 @@ public final class Responses {
     public ByteBuffer createHeaderOnlyBuf(String file) {
         byte[] header = null;
         try {
-            FileInfo fi = FileInfo.get(Paths.get(Server.PUBLIC_HTML_DIR, file), StandardCharsets.UTF_8);
+            FileInfo fi = FileInfo.get(Paths.get(FileInfo.PUBLIC_HTML_DIR, file), StandardCharsets.UTF_8);
             header = ("HTTP/1.1 200 OK\r\n"
                     + "Server: DestSoulsServer v1.0\r\n"
                     + "Content-length: " + fi.getData().limit() + "\r\n"
@@ -128,6 +127,16 @@ public final class Responses {
 
     public ByteBuffer createNotImplementedBuffer() {
         String nfHeader = "HTTP/1.1 501 Not implemented\r\n"
+                + "Server: DestSoulsServer v1.0\r\n\r\n";
+        byte[] nfHeaderData = nfHeader.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer nfBuffer = ByteBuffer.allocate(nfHeaderData.length);
+        nfBuffer.put(nfHeaderData);
+        nfBuffer.flip();
+        return nfBuffer;
+    }
+
+    public ByteBuffer createNotAllowed() {
+        String nfHeader = "HTTP/1.1 405 Method Not Allowed\r\n"
                 + "Server: DestSoulsServer v1.0\r\n\r\n";
         byte[] nfHeaderData = nfHeader.getBytes(StandardCharsets.UTF_8);
         ByteBuffer nfBuffer = ByteBuffer.allocate(nfHeaderData.length);

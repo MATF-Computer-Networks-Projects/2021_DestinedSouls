@@ -1,10 +1,9 @@
 package server.models.users;
 
-import server.middleware.Authorizer;
+import server.security.Authorizer;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 
 public class User {
