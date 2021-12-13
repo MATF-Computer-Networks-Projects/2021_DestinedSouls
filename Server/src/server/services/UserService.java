@@ -3,6 +3,7 @@ package server.services;
 import server.middleware.Authorizer;
 import server.models.users.User;
 import server.models.users.UserTable;
+import server.utils.Csv;
 import server.utils.Json;
 import server.utils.Response;
 
@@ -12,6 +13,7 @@ import java.util.function.Predicate;
 
 public class UserService {
     private static UserTable inMemUserTable = new UserTable();
+    private static Csv data = new Csv("config/data.csv");
 
     public static void load() {
         try {
@@ -32,6 +34,10 @@ public class UserService {
                                 "000000"
                                     )
         );
+        ArrayList<String> res;
+        while(!((res = data.getEntry()) == null)) {
+            inMemUserTable.add(new User(res));
+        }
     }
 
     public static User getById(int id) {

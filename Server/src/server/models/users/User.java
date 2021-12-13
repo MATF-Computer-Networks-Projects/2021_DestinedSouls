@@ -4,6 +4,7 @@ import server.middleware.Authorizer;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -70,7 +71,15 @@ public class User {
               password
         );
     }
-
+    public User(ArrayList<String> args){
+        this( args.toArray()[0].toString(),
+                args.toArray()[1].toString(),
+                args.toArray()[2].toString(),
+                args.toArray()[3].toString(),
+                args.toArray()[4].toString(),
+                args.toArray()[5].toString()
+                );
+    }
     @Override
     public String toString() {
         return "{" +
