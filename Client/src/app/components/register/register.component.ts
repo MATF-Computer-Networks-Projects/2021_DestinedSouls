@@ -62,15 +62,6 @@ export class RegisterComponent implements OnInit {
           this.submitted = false;
           this.failed = true;
         });
-    /*
-        .subscribe(
-            data => {
-                this.router.navigate(['/login']);
-            },
-            error => {
-                this.loading = false;
-            });
-     */
   }
 
   onLogin() {

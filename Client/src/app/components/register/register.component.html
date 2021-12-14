@@ -37,6 +37,8 @@
             <div class="error" *ngIf="getCtrls.email.errors.required">Enter password</div>
             <div class="error" *ngIf="getCtrls.email.errors.email">Enter valid password</div>
         </div>
+
+        <app-file-upload requiredFileType="image/*"></app-file-upload>
         <div *ngIf="failed">
           <div id="errorMsg" class="error"></div>
         </div>
