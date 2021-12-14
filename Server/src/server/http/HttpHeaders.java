@@ -9,8 +9,9 @@ public class HttpHeaders {
     public int hostStartIndex = 0;
     public int hostEndIndex   = 0;
 
-    public String token = null;
-    public int contentLength = 0;
+    public String token       = null;
+    public int contentLength  = 0;
+    public String contentType = null;
 
     public int bodyStartIndex = 0;
     public int bodyEndIndex   = 0;

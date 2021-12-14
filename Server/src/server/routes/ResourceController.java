@@ -2,12 +2,16 @@ package server.routes;
 
 import server.Message;
 import server.http.HttpHeaders;
+import server.http.HttpUtil;
+import server.services.StorageService;
 import server.utils.FileInfo;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 
 public class ResourceController implements IController {
@@ -16,15 +20,15 @@ public class ResourceController implements IController {
     public void get(Message request, Message response) {
         String url = ((HttpHeaders)request.metaData).url;
         String filename = FileInfo.getFilename(url);
-        if (Router.cache.contains(filename)) {
+        if (StorageService.cache.contains(filename)) {
             System.out.println("Resource controller: " + filename);
-            response.writeToMessage(Router.cache.get(filename));
+            response.writeToMessage(StorageService.cache.get(filename).duplicate());
             return;
         } else {
             var path = Paths.get(FileInfo.PUBLIC_HTML_DIR, url);
             if (Files.isRegularFile(path)) {
                 try {
-                    response.writeToMessage( Router.cache.createResponseBuffer(
+                    response.writeToMessage( StorageService.cache.createResponseBuffer(
                                                             FileInfo.get(path, StandardCharsets.UTF_8))
                                             );
                     return;
@@ -33,27 +37,48 @@ public class ResourceController implements IController {
                 }
             }
         }
-        response.writeToMessage( Router.cache.get("404") );
+        response.writeToMessage( StorageService.cache.get("404").duplicate() );
     }
 
     @Override
     public void post(Message request, Message response) {
-        response.writeToMessage( Router.cache.get("501") );
+        var httpHeaders = (HttpHeaders)request.metaData;
+        if(httpHeaders.contentType.startsWith("multipart")) {
+            int boundaryLength = httpHeaders.contentType.length() - httpHeaders.contentType.indexOf("----");
+
+            //int dataStart = httpHeaders.bodyStartIndex + boundaryLength;
+            httpHeaders.bodyStartIndex += boundaryLength + 2; // +2 for CRLF
+            httpHeaders.bodyEndIndex   -= boundaryLength + 2; // +2 for CRLF
+            httpHeaders.contentLength  -= 2 * boundaryLength + 4;
+        }
+
+        int filenameIndex = HttpUtil.findNext(request.sharedArray,
+                                     httpHeaders.bodyStartIndex, httpHeaders.bodyEndIndex, "filename=") + 10;
+        int endLine = HttpUtil.findNextLineBreak(request.sharedArray, filenameIndex, httpHeaders.bodyEndIndex)-2; // "CR
+
+        var filename = HttpUtil.sliceAsString(request.sharedArray, filenameIndex, endLine);
+
+        endLine += 3;
+        int newStart = HttpUtil.findNext(request.sharedArray, endLine, httpHeaders.bodyEndIndex, "\r\n\r\n") + 4;
+
+        httpHeaders.contentLength -= newStart - httpHeaders.bodyStartIndex + 6;
+
+        httpHeaders.bodyStartIndex = newStart;
+        byte[] rawFile = Arrays.copyOfRange(request.sharedArray,
+                                httpHeaders.bodyStartIndex, httpHeaders.bodyStartIndex + httpHeaders.contentLength);
+
+        System.out.println("[" + filename +"]\nContent-Lenght: " + rawFile.length);
+
+        try {
+            StorageService.store(rawFile, filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+            response.writeToMessage(StorageService.cache.get("500").duplicate());
+        }
+
+        response.writeToMessage(StorageService.cache.createResponseBuffer( FileInfo.json(
+                                                            ("{\"filename\":\"" + filename + "\"}").getBytes()) ));
     }
 
-    /*
-
-        System.err.println("Resource controller: no filename " + filename);
-        return new Response(404, "404");
-    }
-
-    public static Response post(String filename, String data) {
-        System.out.println("Filename: " + filename);
-        // System.out.println("Data: " + data);
-
-
-        //System.exit(1);
-        return new Response(200, "{\"msg\":\"Uploaded\"}");
-    }
-     */
+    
 }

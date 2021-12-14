@@ -5,14 +5,13 @@ import server.Message;
 import server.WriteProxy;
 import server.http.EHttpMethod;
 import server.http.HttpHeaders;
-import server.utils.FileInfo;
-import server.utils.Responses;
+import server.services.StorageService;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Router implements IMessageProcessor {
-    static Responses cache = new Responses(FileInfo.PUBLIC_HTML_DIR);
 
     private final Map<String, IController> routes;
 
@@ -33,28 +32,31 @@ public class Router implements IMessageProcessor {
         HttpHeaders req = (HttpHeaders) request.metaData;
 
         if(!isAllowed(req.httpMethod)) {
-            response.writeToMessage(cache.get("405"));
+            response.writeToMessage(StorageService.cache.get("405"));
             writeProxy.enqueue(response);
             return;
         }
+
+        System.out.println("Url: " + req.url);
 
         String filename = req.url.substring(req.url.lastIndexOf('/')+1);
-        if(cache.contains(filename))
+        if(StorageService.cache.contains(filename))
         {
-            response.writeToMessage(Router.cache.get(filename).duplicate());
+            response.writeToMessage(StorageService.cache.get(filename).duplicate());
             writeProxy.enqueue(response);
             return;
         }
 
+        System.out.println("Url: " + filename);
+
         int idx = req.url.indexOf('/',1);
-        String r = idx == -1 ? req.url.substring(1) : req.url.substring(0, idx);
+        String r = idx == -1 ? req.url : req.url.substring(0, idx);
         if(!routes.containsKey(r)) {
-            //response.writeToMessage(cache.get("404").duplicate());
-            //writeProxy.enqueue(response);
             (new ResourceController()).get(request, response);
             writeProxy.enqueue(response);
             return;
         }
+
 
         IController controller = routes.get(r);
         System.out.println("Route: " + controller.toString());
@@ -64,7 +66,7 @@ public class Router implements IMessageProcessor {
             case POST: { controller.post(request, response); break; }
             //case HEAD:
             //case PUT:
-            //case DELETE: { response.writeToMessage(cache.get("501").duplicate());  break; }
+            //case DELETE: { response.writeToMessage(StorageService.cache.get("501").duplicate());  break; }
             default: {    break; }
         }
 

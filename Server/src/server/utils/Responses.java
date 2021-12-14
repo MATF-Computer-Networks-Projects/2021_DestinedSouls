@@ -44,6 +44,7 @@ public final class Responses {
         this.responseBuffers.put("403", this.createForbidden());
         this.responseBuffers.put("404", this.createNotFoundBuffer());
         this.responseBuffers.put("405", this.createNotAllowed());
+        this.responseBuffers.put("500", this.createInternalServerError());
         this.responseBuffers.put("501", this.createNotImplementedBuffer());
     }
 
@@ -80,6 +81,15 @@ public final class Responses {
         buf.flip();
         return buf;
     }
+    private ByteBuffer createNoContent() {
+        byte[] header =
+                "HTTP/1.1 204 No Content\r\nAllow: OPTIONS, GET, HEAD, POST\r\nServer: DestSoulsServer v1.0\r\n\r\n"
+                        .getBytes(StandardCharsets.UTF_8);
+        ByteBuffer nfBuffer = ByteBuffer.allocate(header.length);
+        nfBuffer.put(header);
+        nfBuffer.flip();
+        return nfBuffer;
+    }
 
     public ByteBuffer createBadRequest(String msg) {
         byte[] nfHeaderData = ("HTTP/1.1 400 Bad Request\r\nServer: DestSoulsServer v1.0\r\n\r\n")
@@ -96,7 +106,7 @@ public final class Responses {
         return buf;
     }
 
-    public ByteBuffer createUnauthorizedBuffer() {
+    private ByteBuffer createUnauthorizedBuffer() {
         String uHeader = "HTTP/1.1 401 Unauthorized\r\n"
                 + "Server: DestSoulsServer v1.0\r\n\r\n";
         byte[] nfHeaderData = uHeader.getBytes(StandardCharsets.UTF_8);
@@ -106,7 +116,7 @@ public final class Responses {
         return bufHeader;
     }
 
-    public ByteBuffer createForbidden() {
+    private ByteBuffer createForbidden() {
         byte[] nfHeaderData = ("HTTP/1.1 403 Forbidden\r\nServer: DestSoulsServer v1.0\r\n\r\n")
                 .getBytes(StandardCharsets.UTF_8);
         ByteBuffer buf = ByteBuffer.allocate(nfHeaderData.length);
@@ -115,7 +125,7 @@ public final class Responses {
         return buf;
     }
 
-    public ByteBuffer createNotFoundBuffer() {
+    private ByteBuffer createNotFoundBuffer() {
         String nfHeader = "HTTP/1.1 404 Not found\r\n"
                 + "Server: DestSoulsServer v1.0\r\n\r\n";
         byte[] nfHeaderData = nfHeader.getBytes(StandardCharsets.UTF_8);
@@ -125,17 +135,8 @@ public final class Responses {
         return nfBuffer;
     }
 
-    public ByteBuffer createNotImplementedBuffer() {
-        String nfHeader = "HTTP/1.1 501 Not implemented\r\n"
-                + "Server: DestSoulsServer v1.0\r\n\r\n";
-        byte[] nfHeaderData = nfHeader.getBytes(StandardCharsets.UTF_8);
-        ByteBuffer nfBuffer = ByteBuffer.allocate(nfHeaderData.length);
-        nfBuffer.put(nfHeaderData);
-        nfBuffer.flip();
-        return nfBuffer;
-    }
 
-    public ByteBuffer createNotAllowed() {
+    private ByteBuffer createNotAllowed() {
         String nfHeader = "HTTP/1.1 405 Method Not Allowed\r\n"
                 + "Server: DestSoulsServer v1.0\r\n\r\n";
         byte[] nfHeaderData = nfHeader.getBytes(StandardCharsets.UTF_8);
@@ -145,12 +146,22 @@ public final class Responses {
         return nfBuffer;
     }
 
-    private ByteBuffer createNoContent() {
-        byte[] header =
-                "HTTP/1.1 204 No Content\r\nAllow: OPTIONS, GET, HEAD, POST\r\nServer: DestSoulsServer v1.0\r\n\r\n"
-                        .getBytes(StandardCharsets.UTF_8);
-        ByteBuffer nfBuffer = ByteBuffer.allocate(header.length);
-        nfBuffer.put(header);
+    private ByteBuffer createInternalServerError() {
+        String nfHeader = "HTTP/1.1 500 Internal Server Error\r\n"
+                + "Server: DestSoulsServer v1.0\r\n\r\n";
+        byte[] nfHeaderData = nfHeader.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer nfBuffer = ByteBuffer.allocate(nfHeaderData.length);
+        nfBuffer.put(nfHeaderData);
+        nfBuffer.flip();
+        return nfBuffer;
+    }
+
+    private ByteBuffer createNotImplementedBuffer() {
+        String nfHeader = "HTTP/1.1 501 Not implemented\r\n"
+                + "Server: DestSoulsServer v1.0\r\n\r\n";
+        byte[] nfHeaderData = nfHeader.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer nfBuffer = ByteBuffer.allocate(nfHeaderData.length);
+        nfBuffer.put(nfHeaderData);
         nfBuffer.flip();
         return nfBuffer;
     }

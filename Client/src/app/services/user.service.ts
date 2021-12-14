@@ -23,7 +23,7 @@ export class UserService {
     const formData = new FormData();
     formData.append("thumbnail", file);
 
-    return this.http.put("/upload", formData, {
+    return this.http.post("/upload", formData, {
       reportProgress: true,
       observe: 'events'
     });

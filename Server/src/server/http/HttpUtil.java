@@ -47,9 +47,10 @@ public class HttpUtil {
                     e.printStackTrace();
                 }
             }
-            if(matches(src, prevEndOfHeader, "authorization")) {
+            if(matches(src, prevEndOfHeader, "authorization"))
                 resolveAuthToken(src, prevEndOfHeader, endIndex, httpHeaders);
-            }
+            if(matches(src, prevEndOfHeader, "content-type"))
+                resolveContentType(src, prevEndOfHeader, endIndex, httpHeaders);
 
             prevEndOfHeader = endOfHeader + 1;
             endOfHeader = findNextLineBreak(src, prevEndOfHeader, endIndex);
@@ -131,6 +132,13 @@ public class HttpUtil {
         return -1;
     }
 
+    public static int findNext(byte[] src, int startIndex, int endIndex, String value) {
+        for(int index = startIndex; index < endIndex; index++){
+            if(matches(src, index, value)) return index;
+        }
+        return -1;
+    }
+
     public static int resolveHttpMethod(byte[] src, int startIndex, HttpHeaders httpHeaders){
         if(matches(src, startIndex, GET)) {
             httpHeaders.httpMethod = EHttpMethod.GET;
@@ -196,9 +204,29 @@ public class HttpUtil {
             ++index;
         }
 
-        var token = new ArrayList<Byte>();
         int endIdx = findNextLineBreak(src, index, endIndex) - 1;
 
         httpHeaders.token = new String(Arrays.copyOfRange(src,index, endIdx), StandardCharsets.UTF_8);
+    }
+
+    private static void resolveContentType(byte[] src, int startIndex, int endIndex, HttpHeaders httpHeaders) {
+
+        int indexOfColon = findNext(src, startIndex, endIndex, (byte) ':');
+
+        //skip spaces after colon
+        int index = indexOfColon +1;
+        while(src[index] == ' '){
+            ++index;
+        }
+
+        int endIdx = findNextLineBreak(src, index, endIndex) - 1;
+        httpHeaders.contentType = new String(Arrays.copyOfRange(src,index, endIdx), StandardCharsets.UTF_8);
+    }
+
+    public static String sliceAsString(byte[] src, int startIndex, int endIndex) {
+        if(startIndex < 0 || endIndex >= src.length)
+            return null;
+
+        return new String(Arrays.copyOfRange(src,startIndex, endIndex), StandardCharsets.UTF_8);
     }
 }

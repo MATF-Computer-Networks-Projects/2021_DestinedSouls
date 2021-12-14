@@ -1,3 +1,11 @@
 .file-input {
   display: none;
 }
+
+#filename {
+  float: left;
+}
+
+.upload-btn {
+  float: right;
+}

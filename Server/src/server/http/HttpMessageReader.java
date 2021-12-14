@@ -40,8 +40,10 @@ public class HttpMessageReader implements IMessageReader {
 
         this.nextMessage.writeToMessage(byteBuffer);
 
-        int endIndex = HttpUtil.parseHttpRequest(this.nextMessage.sharedArray, this.nextMessage.offset, this.nextMessage.offset + this.nextMessage.length, (HttpHeaders) this.nextMessage.metaData);
-        if(endIndex != -1){
+        int endIndex = HttpUtil.parseHttpRequest(this.nextMessage.sharedArray, this.nextMessage.offset,
+                                            this.nextMessage.offset + this.nextMessage.length,
+                                                    (HttpHeaders) this.nextMessage.metaData);
+        if(endIndex != -1) {
             Message message = this.messageBuffer.getMessage();
             message.metaData = new HttpHeaders();
 

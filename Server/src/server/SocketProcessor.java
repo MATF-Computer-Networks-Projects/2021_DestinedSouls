@@ -1,5 +1,8 @@
 package server;
 
+import server.routes.Router;
+import server.services.StorageService;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
@@ -34,8 +37,11 @@ public class SocketProcessor implements Runnable {
     private Set<Socket> emptyToNonEmptySockets = new HashSet<>();
     private Set<Socket> nonEmptyToEmptySockets = new HashSet<>();
 
+    private long       cacheTimeout;
+    private final long cacheTtl = 5000;
+
     public SocketProcessor(Queue<Socket> inboundSocketQueue, MessageBuffer readMessageBuffer, MessageBuffer writeMessageBuffer, IMessageReaderFactory messageReaderFactory, IMessageProcessor messageProcessor) throws IOException {
-        this.inboundSocketQueue = inboundSocketQueue;
+        this.inboundSocketQueue   = inboundSocketQueue;
 
         this.readMessageBuffer    = readMessageBuffer;
         this.writeMessageBuffer   = writeMessageBuffer;
@@ -47,18 +53,20 @@ public class SocketProcessor implements Runnable {
 
         this.readSelector         = Selector.open();
         this.writeSelector        = Selector.open();
+
+        this.cacheTimeout         = System.currentTimeMillis();
     }
 
     public void run() {
         //noinspection InfiniteLoopStatement
         while(true){
             try{
-                executeCycle();
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if(System.currentTimeMillis() - this.cacheTimeout > cacheTtl) {
+                    StorageService.resetLocalCache();
+                    this.cacheTimeout = System.currentTimeMillis();
                 }
+
+                executeCycle();
             } catch(IOException e){
                 e.printStackTrace();
             }

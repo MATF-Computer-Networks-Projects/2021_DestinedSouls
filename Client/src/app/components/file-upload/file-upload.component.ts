@@ -38,12 +38,13 @@ export class FileUploadComponent {
   }
 
   cancelUpload() {
-    this.uploadSub.unsubscribe();
+    this.uploadSub.unsubscribe();    
     this.reset();
   }
 
   reset() {
     this.uploadProgress = null;
     this.uploadSub = null;
+    this.fileName = '';
   }
 }
