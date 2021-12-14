@@ -54,6 +54,11 @@ public class SocketProcessor implements Runnable {
         while(true){
             try{
                 executeCycle();
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             } catch(IOException e){
                 e.printStackTrace();
             }

@@ -1,7 +1,5 @@
 package server.http;
 
-import server.utils.FileInfo;
-import server.utils.Responses;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;

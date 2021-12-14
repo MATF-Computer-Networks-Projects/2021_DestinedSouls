@@ -38,12 +38,6 @@ public class Router implements IMessageProcessor {
             return;
         }
 
-        if(req.url.equals("/")) {
-            response.writeToMessage(cache.get("/"));
-            writeProxy.enqueue(response);
-            return;
-        }
-
         String filename = req.url.substring(req.url.lastIndexOf('/')+1);
         if(cache.contains(filename))
         {
