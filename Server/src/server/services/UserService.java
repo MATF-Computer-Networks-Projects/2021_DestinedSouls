@@ -26,14 +26,6 @@ public class UserService {
             e.printStackTrace();
         }
 
-        inMemUserTable.add(new User("Aleksa",
-                                "2021-11-08",
-                                "1",
-                                "2",
-                                "forsaken.veselic@gmail.com",
-                                "000000"
-                                    )
-        );
         ArrayList<String> res;
         while(!((res = data.getEntry()) == null)) {
             inMemUserTable.add(new User(res));

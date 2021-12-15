@@ -30,7 +30,7 @@ public class Csv {
 
             int len =0;
             while(matcher.find() && len++<numOfFields){
-                parsed.add(matcher.group(1));
+                parsed.add(matcher.group(1).replaceAll("^\"|\"$", ""));
             }
             return parsed;
         } catch (IOException e) {
