@@ -5,6 +5,7 @@ import server.security.Authorizer;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class User {
@@ -34,7 +35,6 @@ public class User {
             this.gender   = Genders.fromString(gender);
             this.interest = Genders.fromString(interest);
             this.hash = Authorizer.encrypt(password);
-            //this.hash = MessageDigest.getInstance("SHA-256").digest(password.getBytes(StandardCharsets.UTF_8));
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
             e.printStackTrace();
@@ -71,7 +71,15 @@ public class User {
               password
         );
     }
-
+    public User(ArrayList<String> args){
+        this( args.toArray()[0].toString(),
+                args.toArray()[1].toString(),
+                args.toArray()[2].toString(),
+                args.toArray()[3].toString(),
+                args.toArray()[4].toString(),
+                args.toArray()[5].toString()
+                );
+    }
     @Override
     public String toString() {
         return "{" +

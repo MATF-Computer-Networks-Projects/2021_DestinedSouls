@@ -7,6 +7,9 @@ public class Parsers {
     public static String jsonRegex = "\"([a-zA-Z0-9]+)\":\"([a-zA-Z0-9\\-.@]+)\"";
     public static Pattern jsonPattern = Pattern.compile(jsonRegex);
 
+    public static String csvRegex = "(?:,|\\n|^)(\"(?:(?:\"\")*[^\"]*)*\"|[^\",\\n]*|(?:\\n|$))";
+    public static Pattern csvPattern = Pattern.compile(csvRegex);
+
     /*
     * Authorization: Bearer ynRs+M+fdAQx5lHBIaL/t5KkE1GFy+yTpVfjuBi3xjU=
     * */

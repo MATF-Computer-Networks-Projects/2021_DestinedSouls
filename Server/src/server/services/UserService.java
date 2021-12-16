@@ -3,11 +3,13 @@ package server.services;
 import server.models.users.User;
 import server.models.users.UserTable;
 import server.security.Authorizer;
+import server.utils.Csv;
 import server.utils.Json;
 import server.utils.Response;
 
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.function.Predicate;
 
 public class UserService {
     private static UserTable inMemUserTable = new UserTable();
+    private static Csv data = new Csv("config/data.csv");
 
     public static void load() {
         try {
@@ -27,14 +30,10 @@ public class UserService {
             e.printStackTrace();
         }
 
-        inMemUserTable.add(new User("Aleksa",
-                                "2021-11-08",
-                                "1",
-                                "2",
-                                "forsaken.veselic@gmail.com",
-                                "000000"
-                                    )
-        );
+        ArrayList<String> res;
+        while(!((res = data.getEntry()) == null)) {
+            inMemUserTable.add(new User(res));
+        }
     }
 
     public static User getById(int id) {
@@ -46,7 +45,6 @@ public class UserService {
     public static List<User> getAll(int id) {
         if(inMemUserTable.hasId(id))
         {
-            //return (User[])inMemUserTable.getAll().toArray();
             return new LinkedList<User>(inMemUserTable.getAll());
         }
         return null;
