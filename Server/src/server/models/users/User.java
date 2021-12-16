@@ -2,6 +2,7 @@ package server.models.users;
 
 import server.security.Authorizer;
 
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,6 +15,7 @@ public class User {
     public Gender interest;
     public String email;
     public byte[] hash;
+    public Path image = null;
 
     private static int idObj = 1;
 
@@ -80,5 +82,9 @@ public class User {
                 ",\"interest\":\"" + interest + "\"" +
                 ",\"email\":\"" + email  + "\"" +
                 '}';
+    }
+
+    public void setImage(Path path) {
+        this.image = path;
     }
 }

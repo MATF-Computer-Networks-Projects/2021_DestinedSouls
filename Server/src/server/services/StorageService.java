@@ -23,11 +23,11 @@ public class StorageService {
         }
     }
 
-    public static void store(byte[] rawFile, String path) throws IOException {
+    public static Path store(byte[] rawFile, String path) throws IOException {
         if(!Files.exists(uploadsDir))
             Files.createDirectories(uploadsDir);
 
-        Files.write(Paths.get(uploadsDir.toString(),
+        return Files.write(Paths.get(uploadsDir.toString(),
                             String.valueOf(System.currentTimeMillis()) + '_' +path), rawFile);
     }
 }

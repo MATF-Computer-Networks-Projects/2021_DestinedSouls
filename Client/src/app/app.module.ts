@@ -16,7 +16,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LoginComponent } from './components/login/login.component';
 import { HomepageComponent } from './components/homepage/homepage.component';
 import { RegisterComponent } from './components/register/register.component';
-import { FileUploadComponent } from './components/file-upload/file-upload.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
@@ -26,8 +25,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     //IlustrationComponent,
     LoginComponent,
     HomepageComponent,
-    RegisterComponent,
-    FileUploadComponent
+    RegisterComponent
   ],
   imports: [
     BrowserModule,

@@ -3,8 +3,11 @@ package server.routes;
 import server.Message;
 import server.http.HttpHeaders;
 import server.http.HttpUtil;
+import server.security.Authorizer;
 import server.services.StorageService;
+import server.services.UserService;
 import server.utils.FileInfo;
+import server.utils.Json;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -43,6 +46,12 @@ public class ResourceController implements IController {
     @Override
     public void post(Message request, Message response) {
         var httpHeaders = (HttpHeaders)request.metaData;
+        if(httpHeaders.token == null) {
+            response.writeToMessage(StorageService.cache.get("401").duplicate());
+        }
+
+        int id = Integer.parseInt(Json.parseJSON(Authorizer.parseToken(httpHeaders.token)).get("sub"));
+
         if(httpHeaders.contentType.startsWith("multipart")) {
             int boundaryLength = httpHeaders.contentType.length() - httpHeaders.contentType.indexOf("----");
 
@@ -70,14 +79,19 @@ public class ResourceController implements IController {
         System.out.println("[" + filename +"]\nContent-Lenght: " + rawFile.length);
 
         try {
-            StorageService.store(rawFile, filename);
+            Path imgPath = StorageService.store(rawFile, filename);
+            var res = UserService.addImage(id, imgPath);
+            if(res.status == 200)
+                response.writeToMessage(StorageService.cache.createResponseBuffer(
+                                                                            FileInfo.json( res.json.getBytes() )));
+            else
+                response.writeToMessage(StorageService.cache.get("404").duplicate() );
+
         } catch (IOException e) {
             e.printStackTrace();
             response.writeToMessage(StorageService.cache.get("500").duplicate());
         }
 
-        response.writeToMessage(StorageService.cache.createResponseBuffer( FileInfo.json(
-                                                            ("{\"filename\":\"" + filename + "\"}").getBytes()) ));
     }
 
     

@@ -6,6 +6,7 @@ import server.security.Authorizer;
 import server.utils.Json;
 import server.utils.Response;
 
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -107,16 +108,25 @@ public class UserService {
         return new Response(401, null);
     }
 
-    /*
-     * Register new user in table
-     * Returns formatted user as string without password
-     * If user with provided email does not exist, null returned
+    /**
+     * Register new user in table,
+     *
+     * @param Json user
+     * @return Formatted user as string without password. If user with provided email does not exist, null returned
      */
     public static Response register(Json user) {
         if(getIf(user1 -> user1.email.equals(user.get("email"))) != null)
             return new Response(403, null);
         User newUser = userFromJson(user);
         inMemUserTable.add(newUser);
-        return new Response(200, "{" + omitHash(newUser) + "}");
+        return new Response(200, omitHash(newUser, Authorizer.token(newUser.id)) );
+    }
+
+    public static Response addImage(int id, Path imagePath) {
+        var user = getById(id);
+        if(user == null)
+            return new Response(404, null);
+        user.setImage(imagePath);
+        return new Response(200, "{\"filename\":\"" + imagePath + "\"}");
     }
 }

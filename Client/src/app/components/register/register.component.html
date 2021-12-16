@@ -32,14 +32,41 @@
                 <div class="error" *ngIf="getCtrls.email.errors.required">Enter email</div>
                 <div class="error" *ngIf="getCtrls.email.errors.email">Enter valid email</div>
             </div>
-        <input name="password" class="input" type="password" name="password" placeholder="Password" style="margin-bottom: 5px;" formControlName="password" [ngClass]="{ 'is-invalid': submitted && getCtrls.password.errors }" />
+        <input name="password" class="input" type="password" placeholder="Password" style="margin-bottom: 5px;" formControlName="password" [ngClass]="{ 'is-invalid': submitted && getCtrls.password.errors }" />
         <div *ngIf="submitted && getCtrls.password.errors" class="invalid-feedback">
             <div class="error" *ngIf="getCtrls.email.errors.required">Enter password</div>
             <div class="error" *ngIf="getCtrls.email.errors.email">Enter valid password</div>
         </div>
 
-        <app-file-upload requiredFileType="image/*"></app-file-upload>
-        <div *ngIf="failed">
+      <div>
+        <input name="image" type="file" class="file-input" formControlName="image" [ngClass]="{ 'is-invalid': submitted && getCtrls.password.errors }"
+               [accept]="requiredFileType"
+               (change)="onFileSelected($event)" #fileUpload>
+
+        <div class="file-upload">
+          <div id="filename">
+            {{fileName || "No file uploaded yet."}}
+          </div>
+          <button mat-mini-fab color="primary" class="upload-btn"
+                  (click)="fileUpload.click()">
+            <mat-icon>attach_file</mat-icon>
+          </button>
+        </div>
+        <span class="progress">
+          <mat-progress-bar class="progress-bar" mode="determinate"
+                            [value]="uploadProgress" *ngIf="uploadProgress">
+          </mat-progress-bar>
+          <mat-icon class="cancel-upload" (click)="cancelUpload()"
+                    *ngIf="uploadProgress">delete_forever</mat-icon>
+        </span>
+      </div>
+      <div >
+
+      </div>
+
+
+
+      <div *ngIf="failed">
           <div id="errorMsg" class="error"></div>
         </div>
         <!--<input name="phone" class="input" type="tel" placeholder="Phone number" [(ngModel)]="phone">-->

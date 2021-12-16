@@ -19,11 +19,12 @@ export class UserService {
     return this.http.get<User[]>('/users/getAll');
   }
 
-  upload(file: File): Observable<any> {
+  upload(file: File, token: string): Observable<any> {
     const formData = new FormData();
     formData.append("thumbnail", file);
 
     return this.http.post("/upload", formData, {
+      headers: { Authorization: `Bearer ${token}` },
       reportProgress: true,
       observe: 'events'
     });
