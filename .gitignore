@@ -50,3 +50,5 @@ Client/.angular
 Client/node_modules
 Client/dist
 Client/tmp
+
+public_*

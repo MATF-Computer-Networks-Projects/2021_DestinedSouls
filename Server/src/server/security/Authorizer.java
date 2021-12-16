@@ -1,6 +1,5 @@
-package server.middleware;
+package server.security;
 
-import server.Router;
 import server.models.users.User;
 import server.services.UserService;
 import server.utils.Json;
@@ -11,11 +10,10 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class Authorizer {
@@ -122,5 +120,9 @@ public class Authorizer {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String parseToken(byte[] token) {
+        return parseToken(new String(token));
     }
 }

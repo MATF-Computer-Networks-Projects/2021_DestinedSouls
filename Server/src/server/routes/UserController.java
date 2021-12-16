@@ -1,71 +1,104 @@
 package server.routes;
 
-import server.middleware.Validator;
-import server.models.users.User;
+import server.Message;
+import server.http.HttpHeaders;
+import server.security.Authorizer;
+import server.services.StorageService;
 import server.services.UserService;
+import server.services.Validator;
+import server.utils.FileInfo;
 import server.utils.Json;
-import server.utils.Parsers;
 import server.utils.Response;
 
-import java.nio.channels.SelectionKey;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
-public class UserController {
-    public static Response get(String url) {
-        return get(url, null);
+public class UserController implements IController {
+    private static final String routeRoot = "/users";
+    public UserController() {
     }
-    public static Response get(String url, Integer id) {
-        System.out.println("User controller " + url);
+
+    @Override
+    public void get(Message request, Message response) {
+        var httpMeta = (HttpHeaders)request.metaData;
+        String url = httpMeta.url.substring(routeRoot.length());
+
         switch (url) {
-            case "":
-            case "/": return null;
-            case "getAll": {
-                if(id == null) { return new Response(403, null); }
+            case "/getAll": {
+                if(httpMeta.token == null) {
+                    response.writeToMessage(StorageService.cache.get("401").duplicate());
+                    return;
+                }
+                Json token = new Json(Authorizer.parseToken(httpMeta.token));
+
+                if(token == null) {
+                    response.writeToMessage(StorageService.cache.get("401").duplicate());
+                    return;
+                }
+
+                int id = Integer.parseInt(token.get("sub"));
+                if(id <= 0) { response.writeToMessage(StorageService.cache.get("403").duplicate()); return; }
                 var users = UserService.getAll(id);
-                if(users == null) { return new Response(403, null); }
+                if(users == null) { response.writeToMessage(StorageService.cache.get("403").duplicate()); return; }
                 StringBuilder sb = new StringBuilder("[");
                 for(var u : users)
                     sb.append(u).append(',');
-                sb.append(']');
-                return new Response(200, sb.toString());
+                sb.setCharAt(sb.length()-1, ']');
+                System.out.println(sb);
+
+                response.writeToMessage(StorageService.cache.createResponseBuffer(FileInfo.json(
+                        StandardCharsets.UTF_8, sb.toString().getBytes())));
+                return;
             }
-            default: return new Response(501, null);
+            default: response.writeToMessage(StorageService.cache.get("501").duplicate());
         }
     }
 
-    public static Response post(String url, Json reqBody) {
-        //System.out.println("User controller: " + url + "\r\n" + data);
-        // Json reqBody = new Json(data);
-        System.out.println("User controller: " + url + "\r\n" + reqBody);
+    @Override
+    public void post(Message request, Message response) {
+        var httpMeta = (HttpHeaders)request.metaData;
+        String url = httpMeta.url.substring(routeRoot.length());
+
+        Json reqBody = new Json( new String( Arrays.copyOfRange(request.sharedArray,
+                                                    httpMeta.bodyStartIndex,
+                                                    httpMeta.bodyEndIndex) )
+                                );
+
 
         switch (url) {
-            case "authenticate": {
-                var err = catchError(reqBody, new String[]{"email", "password"});
-                if(err != null)
-                    return err;
+            case "/authenticate": {
+                if(!Validator.validateSchema(reqBody, new String[]{"email", "password"})) {
+                    response.writeToMessage(StorageService.cache.createBadRequest(reqBody.get("error")).duplicate());
+                    return;
+                }
 
-                return UserService.authenticate(
-                        reqBody.get("email"),
-                        reqBody.get("password")
-                );
-            }
-            case "register": {
-                var err = catchError(reqBody, new String[]{"name", "birthday", "gender",
-                                                                    "interest", "email", "password"});
-                if(err != null)
-                    return err;
+                Response res = UserService.authenticate(reqBody.get("email"), reqBody.get("password"));
+                if(res.status == 404) {
+                    response.writeToMessage(StorageService.cache.get("404").duplicate());
+                    return;
+                }
 
-                return UserService.register(reqBody);
+                response.writeToMessage(StorageService.cache.createResponseBuffer(FileInfo.json(
+                                                                        StandardCharsets.UTF_8, res.json.getBytes())));
+                break;
             }
-            default: return new Response(404, null);
+
+            case "/register": {
+                if(!Validator.validateSchema(reqBody, new String[]{"name", "birthday", "gender",
+                        "interest", "email", "password"})) {
+                    response.writeToMessage(StorageService.cache.createBadRequest("Missing key: \""
+                                                                            + reqBody.get("error") + "\""));
+                    return;
+                }
+
+                Response res = UserService.register(reqBody);
+                response.writeToMessage(StorageService.cache.createResponseBuffer(FileInfo.json(
+                                                                    StandardCharsets.UTF_8, res.json.getBytes())));
+                break;
+            }
+            default: response.writeToMessage(StorageService.cache.get("501").duplicate());
         }
-    }
 
-    private static Response catchError(Json reqBody, String[] options) {
-        if(Validator.validateSchema(reqBody, options))
-            return null;
-        return new Response(400, "Missing option \"" + reqBody.get("error") + '\"');
+
     }
 }

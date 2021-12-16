@@ -23,4 +23,14 @@ public class Parsers {
         }
         return null;
     }
+
+    private static Pattern fileUploadPattern = Pattern.compile("filename=\"(.*\\.[a-z]+)\"");
+    public static String getFilename(String data) {
+        Matcher matcher = authTokenPattern.matcher(data);
+        if(matcher.find()) {
+            System.err.println("Token: " + matcher.group(1));
+            return matcher.group(1);
+        }
+        return null;
+    }
 }

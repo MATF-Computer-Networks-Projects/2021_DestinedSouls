@@ -34,6 +34,8 @@ public class Json {
         return new Json(data);
     }
 
+    public int getSize() { return jsonObj.size(); }
+
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("{");

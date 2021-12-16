@@ -1,11 +1,11 @@
 package server.models.users;
 
-import server.middleware.Authorizer;
+import server.security.Authorizer;
 
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 public class User {
@@ -16,6 +16,7 @@ public class User {
     public Gender interest;
     public String email;
     public byte[] hash;
+    public Path image = null;
 
     private static int idObj = 1;
 
@@ -34,7 +35,6 @@ public class User {
             this.gender   = Genders.fromString(gender);
             this.interest = Genders.fromString(interest);
             this.hash = Authorizer.encrypt(password);
-            //this.hash = MessageDigest.getInstance("SHA-256").digest(password.getBytes(StandardCharsets.UTF_8));
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
             e.printStackTrace();
@@ -90,5 +90,9 @@ public class User {
                 ",\"interest\":\"" + interest + "\"" +
                 ",\"email\":\"" + email  + "\"" +
                 '}';
+    }
+
+    public void setImage(Path path) {
+        this.image = path;
     }
 }

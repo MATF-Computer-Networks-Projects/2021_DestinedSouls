@@ -1,8 +1,6 @@
-package server.middleware;
+package server.services;
 
 import server.utils.Json;
-
-import java.util.List;
 
 public class Validator {
     public static boolean validateSchema(Json json, String[] options) {
