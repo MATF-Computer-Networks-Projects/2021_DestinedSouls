@@ -29,6 +29,7 @@ public class Message {
     public int writeToMessage(ByteBuffer byteBuffer) {
         int remaining = byteBuffer.remaining();
 
+        // while(this.length + remaining > capacity){
         while(this.length + remaining > capacity){
             if(!this.messageBuffer.expandMessage(this)) {
                 return -1;

@@ -66,9 +66,9 @@ public class HttpUtil {
 
         if(bodyEndIndex <= endIndex){
             //byte array contains a full HTTP request
+
             httpHeaders.bodyStartIndex = bodyStartIndex;
             httpHeaders.bodyEndIndex   = bodyEndIndex;
-
             return bodyEndIndex;
         }
 

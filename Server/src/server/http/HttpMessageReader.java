@@ -1,9 +1,6 @@
 package server.http;
 
-import server.IMessageReader;
-import server.Message;
-import server.MessageBuffer;
-import server.Socket;
+import server.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -31,6 +28,7 @@ public class HttpMessageReader implements IMessageReader {
     @Override
     public void read(Socket socket, ByteBuffer byteBuffer) throws IOException {
         int bytesRead = socket.read(byteBuffer);
+
         byteBuffer.flip();
 
         if(byteBuffer.remaining() == 0){
@@ -38,7 +36,18 @@ public class HttpMessageReader implements IMessageReader {
             return;
         }
 
-        this.nextMessage.writeToMessage(byteBuffer);
+        bytesRead = this.nextMessage.writeToMessage(byteBuffer);
+        if(bytesRead == -1) {
+            Message message = this.messageBuffer.getMessage();
+            message.metaData = new HttpHeaders();
+            ((HttpHeaders)this.nextMessage.metaData).httpMethod = EHttpMethod.ERROR;
+            message.writePartialMessageToMessage(nextMessage, 0);
+            completeMessages.add(nextMessage);
+            nextMessage = message;
+            byteBuffer.clear();
+            socket.endOfStreamReached = true;
+            return;
+        }
 
         int endIndex = HttpUtil.parseHttpRequest(this.nextMessage.sharedArray, this.nextMessage.offset,
                                             this.nextMessage.offset + this.nextMessage.length,
