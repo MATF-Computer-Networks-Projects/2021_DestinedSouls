@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Chat</title>
+</head>
+
+<div class="ui container" >
+  <h1> Messages: </h1>
+  <div class="ui top attached tabular menu">
+    <a *ngFor="let user of activeUsers | slice:0:1" class="item active" [attr.data-tab]="user" >{{ user }}</a>
+    <a *ngFor="let user of activeUsers | slice:1" class="item" [attr.data-tab]="user" >{{ user }}</a>
+
+  </div>
+
+  <div *ngFor="let user of activeUsers| slice:0:1" class="ui bottom attached tab segment active" [attr.data-tab]="user" >
+    <p>tekst poruke {{user}}</p>
+  </div>
+  <div *ngFor="let user of activeUsers| slice:1" class="ui bottom attached tab segment" [attr.data-tab]="user" >
+    <p>tekst poruke {{user}}</p>
+  </div>
+</div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+
+
+</html>
+
