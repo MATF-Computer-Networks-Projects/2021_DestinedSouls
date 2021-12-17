@@ -7,6 +7,7 @@ import { APP_BASE_HREF, LocationStrategy, HashLocationStrategy } from '@angular/
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { AppComponent } from './app.component';
 //import { FormComponent } from './components/form/form.component';
@@ -39,7 +40,8 @@ import { ChatComponent } from './components/chat/chat.component';
     BrowserAnimationsModule,
     MatCardModule,
     MatIconModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatTabsModule
   ],
   providers: [
     { provide: APP_BASE_HREF, useValue: '/'},

@@ -5,23 +5,52 @@
   <title>Chat</title>
 </head>
 
-<div class="ui container" >
-  <h1> Messages: </h1>
-  <div class="ui top attached tabular menu">
-    <a *ngFor="let user of activeUsers | slice:0:1" class="item active" [attr.data-tab]="user" >{{ user }}</a>
-    <a *ngFor="let user of activeUsers | slice:1" class="item" [attr.data-tab]="user" >{{ user }}</a>
+<h1> Messages: </h1>
+<mat-tab-group>
+  <mat-tab *ngFor="let user of activeUsers"  [label] = user > Poruka od : {{user}}
+  </mat-tab>
+</mat-tab-group>
 
-  </div>
 
-  <div *ngFor="let user of activeUsers| slice:0:1" class="ui bottom attached tab segment active" [attr.data-tab]="user" >
-    <p>tekst poruke {{user}}</p>
-  </div>
-  <div *ngFor="let user of activeUsers| slice:1" class="ui bottom attached tab segment" [attr.data-tab]="user" >
-    <p>tekst poruke {{user}}</p>
-  </div>
-</div>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
 
 
 </html>
 
+<!--
+div class="ui container"  >
+  <h1> Messages: </h1>
+  <div class="ui top attached tabular menu" >
+    <a class="item"  data-tab="Aleksa" >Aleksa</a>
+    <a class="item"  data-tab="Djordje" >Djordje</a>
+    <a class="item"  data-tab="Petar" >Petar</a>
+
+  </div>
+
+  <div class="ui bottom attached tab "  data-tab="Aleksa">
+    <p>tekst poruke Aleksa</p>
+  </div>
+  <div class="ui bottom attached tab "  data-tab="Djordje">
+    <p>tekst poruke Djordje</p>
+  </div>
+  <div class="ui bottom attached tab "  data-tab="Petar">
+    <p>tekst poruke Petar</p>
+  </div>
+
+</div>
+<div class="ui top attached tabular menu" >
+    <a class="item" *ngFor="let user of activeUsers" [attr.data-tab]="user" >{{ user }}</a>
+  </div>
+
+  <div class="ui bottom attached tab " *ngFor="let user of activeUsers" [attr.data-tab]="user" >
+    <p>tekst poruke {{user}}</p>
+  </div>
+</div>
+
+    <a class="item active" [attr.data-tab]="user" >{{ user }}</a>
+
+
+ <div class="ui bottom attached tab segment active" [attr.data-tab]="user" >
+    <p>tekst poruke {{user}}</p>
+  </div>
+-->
