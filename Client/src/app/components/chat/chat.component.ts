@@ -9,12 +9,18 @@ import {MatTabsModule} from '@angular/material/tabs';
 
 export class ChatComponent  {
 
-  activeUsers: string[] = ['Aleksa','Djordje','Petar'];
-
+  onlineUsers: string[] = ['Aleksa','Djordje','Petar'];
+  chatActiveWith : string;
+  displayChat: boolean = false;
   constructor() {
   }
 
 
-
-
+  openChatWith(user: string) {
+    if(!this.onlineUsers.some(elem => elem ==user)){
+      console.log("User: " + user + " not online, can't chat with him anymore :(");
+    }
+    this.chatActiveWith = user;
+    this.displayChat = true;
+  }
 }

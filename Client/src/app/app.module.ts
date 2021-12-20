@@ -8,6 +8,8 @@ import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatDividerModule } from '@angular/material/divider';
 
 import { AppComponent } from './app.component';
 //import { FormComponent } from './components/form/form.component';
@@ -41,7 +43,9 @@ import { ChatComponent } from './components/chat/chat.component';
     MatCardModule,
     MatIconModule,
     MatProgressBarModule,
-    MatTabsModule
+    MatTabsModule,
+    MatSidenavModule,
+    MatDividerModule
   ],
   providers: [
     { provide: APP_BASE_HREF, useValue: '/'},
