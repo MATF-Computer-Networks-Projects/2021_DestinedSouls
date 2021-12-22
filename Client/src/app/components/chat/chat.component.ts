@@ -3,7 +3,8 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {AuthenticationService, UserService} from "../../services";
 import {Router} from "@angular/router";
 import { User } from 'src/app/models';
-import {BehaviorSubject, Observable, Subject, Subscribable} from "rxjs";
+import {BehaviorSubject, Observable, Observer, Subject, Subscribable} from "rxjs";
+import {map} from "rxjs/operators";
 
 @Component({
   selector: 'app-chat',
@@ -14,31 +15,39 @@ import {BehaviorSubject, Observable, Subject, Subscribable} from "rxjs";
 export class ChatComponent implements OnInit{
 
   onlineUsers: string[] = ['Aleksa','Djordje','Petar'];
-  users : Subject<User[]>;
-  usersObservable : Observable<User[]>;
-  usersNames : String[];
+  usersArray : User[];
+  usersNames : string[] = [];
   chatActiveWith : string;
   displayChat: boolean = false;
+  displayOnline : boolean = false;
+
   constructor(private authenticationService: AuthenticationService,
               private userService: UserService,
               private router: Router) { }
 
   ngOnInit(): void {
-    this.userService.getOnline().subscribe(this.users);
-    this.usersObservable = this.users.asObservable();
-    this.users
-      .subscribe(next => {
-       next.map(user => {this.usersNames.push(user.name)});
-    })
 
   }
 
 
   openChatWith(user: string) {
-    if(!this.usersNames.some(elem => elem == user)){
+    if(!this.usersNames.includes(user)){
       console.log("User: " + user + "is not online, can't chat with him anymore :(");
     }
     this.chatActiveWith = user;
     this.displayChat = true;
+  }
+
+
+  addOnline() {
+    this.userService.getOnline()
+      .subscribe( value  => {
+        this.usersArray = value;
+        this.usersArray.map( user => {
+          if(!this.usersNames.includes(user.name))
+              this.usersNames.push(user.name); });
+        console.log("neko se ulogovao!");
+        this.displayOnline=true;
+      });
   }
 }

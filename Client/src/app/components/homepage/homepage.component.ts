@@ -17,7 +17,6 @@ export class HomepageComponent implements OnInit {
   }
 
   onLogout() {
-    console.log("usao u logout");
     this.authenticationService.logout()
       .subscribe(next=>{
           this.router.navigateByUrl('/login');
@@ -35,5 +34,9 @@ export class HomepageComponent implements OnInit {
       });
 
 
+  }
+
+  onChat() {
+    this.router.navigateByUrl('/chat');
   }
 }
