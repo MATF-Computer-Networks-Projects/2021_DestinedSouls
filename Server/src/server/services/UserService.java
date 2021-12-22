@@ -17,6 +17,7 @@ import java.util.function.Predicate;
 
 public class UserService {
     private static UserTable inMemUserTable = new UserTable();
+    public static UserTable inMemUserTableOnline = new UserTable();
     private static Csv data = new Csv("config/data.csv");
 
     public static void load() {
@@ -46,6 +47,14 @@ public class UserService {
         if(inMemUserTable.hasId(id))
         {
             return new LinkedList<User>(inMemUserTable.getAll());
+        }
+        return null;
+    }
+
+    public static List<User> getOnline(int id) {
+        if(inMemUserTable.hasId(id))
+        {
+            return new LinkedList<User>(inMemUserTableOnline.getAll());
         }
         return null;
     }
@@ -100,8 +109,10 @@ public class UserService {
             return new Response(404,null);
         }
 
-        if(Arrays.hashCode(Authorizer.encrypt(reqPassword)) == Arrays.hashCode(user.hash))
+        if(Arrays.hashCode(Authorizer.encrypt(reqPassword)) == Arrays.hashCode(user.hash)){
+            inMemUserTableOnline.add(user);
             return new Response(200, omitHash(user, Authorizer.token(user.id)));
+        }
 
         return new Response(401, null);
     }

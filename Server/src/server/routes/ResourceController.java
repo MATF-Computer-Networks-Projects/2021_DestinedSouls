@@ -94,5 +94,6 @@ public class ResourceController implements IController {
 
     }
 
-    
+    @Override
+    public void delete(Message request, Message response) {  }
 }

@@ -2,8 +2,8 @@
     <mat-drawer mode="side" opened>
         <br>
         <h3>Online:</h3>
-    <div *ngFor="let user of onlineUsers">
-        <button (click)="openChatWith(user)" style="width:75%"><mat-icon>message</mat-icon>{{user}}</button><br>
+    <div *ngFor="let user of usersObservable | async">
+        <button (click)="openChatWith(user.name)" class="btnOnline" ><a style="color: #00af2e">  •</a> {{user.name}}</button><br>
     </div>
     </mat-drawer>
 

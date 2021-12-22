@@ -17,8 +17,12 @@ export class HomepageComponent implements OnInit {
   }
 
   onLogout() {
-    this.authenticationService.logout();
-    this.router.navigateByUrl('/login');
+    console.log("usao u logout");
+    this.authenticationService.logout()
+      .subscribe(next=>{
+          this.router.navigateByUrl('/login');
+    });
+
   }
 
   onGetAll() {

@@ -18,5 +18,10 @@
   bottom:40px;
   width: 100%;
 }
+.btnOnline{
+  text-align: left;
+  width:100px;
+  margin: 5px 20px 5px 0px;
+}
 
 

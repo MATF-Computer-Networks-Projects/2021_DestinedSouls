@@ -92,6 +92,7 @@ public class User {
                 '}';
     }
 
+
     public void setImage(Path path) {
         this.image = path;
     }

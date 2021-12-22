@@ -62,11 +62,11 @@ public class Router implements IMessageProcessor {
         System.out.println("Route: " + controller.toString());
 
         switch (req.httpMethod) {
-            case GET:  { controller.get(request, response);  break; }
-            case POST: { controller.post(request, response); break; }
+            case GET:       { controller.get(request, response);  break; }
+            case POST:      { controller.post(request, response); break; }
+            case DELETE:    { controller.delete(request, response); break; }
             //case HEAD:
             //case PUT:
-            //case DELETE: { response.writeToMessage(StorageService.cache.get("501").duplicate());  break; }
             default: {    break; }
         }
 

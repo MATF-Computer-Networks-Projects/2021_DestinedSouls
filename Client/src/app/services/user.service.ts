@@ -18,7 +18,10 @@ export class UserService {
   getAll(): Observable<User[]> {
     return this.http.get<User[]>('/users/getAll');
   }
-
+  //TODO: dodati getOnline
+  getOnline(): Observable<User[]> {
+    return this.http.get<User[]>('/users/getOnline');
+  }
   upload(file: File, token: string): Observable<any> {
     const formData = new FormData();
     formData.append("thumbnail", file);
