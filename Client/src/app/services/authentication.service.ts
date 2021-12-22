@@ -9,7 +9,7 @@ import { User } from '../models';
   providedIn: 'root'
 })
 export class AuthenticationService {
-  private currentUserSubject: BehaviorSubject<User>;
+  currentUserSubject: BehaviorSubject<User>;
   public currentUser: Observable<User>;
 
   constructor(private http: HttpClient) {
@@ -33,19 +33,11 @@ export class AuthenticationService {
 
   logout() {
     // remove user from local storage and set current user to null
-    //TODO: reroute to '/loign'
     localStorage.removeItem('currentUser');
-    return this.http.delete(`/users/${this.currentUserSubject.getValue().id}`)
-      .pipe(map(data =>{this.currentUserSubject.next(null);}));
+    return this.http.delete(`/users/${this.currentUserSubject.getValue().id}`);
+    //FIXME: ovaj deo koda se ne izvrsava
+    this.currentUserSubject.next(null);
   }
-  // logout() {
-//   //FIXME: ovo iz nekog razloga ucini da delete metod ceka
-//   localStorage.removeItem('currentUser');
-//   let url: string;
-//   url = "/users/" + `${this.currentUserSubject.getValue().id}`;
-//   this.currentUserSubject.next(null);
-//   console.log("currentUserSubject.id=" + url)
-//   return this.http.delete(url);
-// }
+
 }
 

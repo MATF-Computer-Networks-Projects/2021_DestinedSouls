@@ -151,7 +151,7 @@ public class UserController implements IController {
 
                 StringBuilder sb = new StringBuilder("[");
                 sb.append(user);
-                sb.setCharAt(sb.length()-1, ']');
+                sb.append(']');
                 System.out.println(sb);
 
                 response.writeToMessage(StorageService.cache.createResponseBuffer(FileInfo.json(
