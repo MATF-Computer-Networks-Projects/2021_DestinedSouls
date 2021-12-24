@@ -1,98 +1,85 @@
 package server.routes;
 
-import server.Message;
-import server.http.HttpHeaders;
-import server.http.HttpUtil;
+import server.http.HttpRequest;
 import server.security.Authorizer;
 import server.services.StorageService;
 import server.services.UserService;
 import server.utils.FileInfo;
-import server.utils.Json;
+import server.utils.Response;
+import server.utils.Responses;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 
 public class ResourceController implements IController {
 
     @Override
-    public void get(Message request, Message response) {
-        String url = ((HttpHeaders)request.metaData).url;
+    public Response handle(Object request) {
+        return handleHttp((HttpRequest) request);
+    }
+
+    private Response handleHttp(HttpRequest request) {
+        switch (request.headers.httpMethod) {
+            case GET:  { return get(request.headers.url); }
+            case POST: { return post(request); }
+            //case HEAD:
+            //case PUT:
+            //case DELETE: { response.writeToMessage(StorageService.cache.get("501").duplicate());  break; }
+            default: {    return new Response(405); }
+        }
+    }
+
+    static Response get(String url) {
+
         String filename = FileInfo.getFilename(url);
-        if (StorageService.cache.contains(filename)) {
-            System.out.println("Resource controller: " + filename);
-            response.writeToMessage(StorageService.cache.get(filename).duplicate());
-            return;
-        } else {
+        if (!StorageService.cache.contains(filename)) {
             var path = Paths.get(FileInfo.PUBLIC_HTML_DIR, url);
             if (Files.isRegularFile(path)) {
                 try {
-                    response.writeToMessage( StorageService.cache.createResponseBuffer(
-                                                            FileInfo.get(path, StandardCharsets.UTF_8))
-                                            );
-                    return;
+                    StorageService.cache.put(
+                        filename,
+                        Responses.createResponseBuffer(FileInfo.get(path, StandardCharsets.UTF_8))
+                    );
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    return new Response(405);
                 }
             }
         }
-        response.writeToMessage( StorageService.cache.get("404").duplicate() );
+
+        return new Response(200, "\"filename\":\"" + filename + '\"');
     }
 
-    @Override
-    public void post(Message request, Message response) {
-        var httpHeaders = (HttpHeaders)request.metaData;
-        if(httpHeaders.token == null) {
-            response.writeToMessage(StorageService.cache.get("401").duplicate());
-        }
 
-        int id = Integer.parseInt(Json.parseJSON(Authorizer.parseToken(httpHeaders.token)).get("sub"));
+    static Response post(HttpRequest request) {
+        if(request.headers.token == null)
+            return new Response(401);
 
-        if(httpHeaders.contentType.startsWith("multipart")) {
-            int boundaryLength = httpHeaders.contentType.length() - httpHeaders.contentType.indexOf("----");
-
-            //int dataStart = httpHeaders.bodyStartIndex + boundaryLength;
-            httpHeaders.bodyStartIndex += boundaryLength + 2; // +2 for CRLF
-            httpHeaders.bodyEndIndex   -= boundaryLength + 2; // +2 for CRLF
-            httpHeaders.contentLength  -= 2 * boundaryLength + 4;
-        }
-
-        int filenameIndex = HttpUtil.findNext(request.sharedArray,
-                                     httpHeaders.bodyStartIndex, httpHeaders.bodyEndIndex, "filename=") + 10;
-        int endLine = HttpUtil.findNextLineBreak(request.sharedArray, filenameIndex, httpHeaders.bodyEndIndex)-2; // "CR
-
-        var filename = HttpUtil.sliceAsString(request.sharedArray, filenameIndex, endLine);
-
-        endLine += 3;
-        int newStart = HttpUtil.findNext(request.sharedArray, endLine, httpHeaders.bodyEndIndex, "\r\n\r\n") + 4;
-
-        httpHeaders.contentLength -= newStart - httpHeaders.bodyStartIndex + 6;
-
-        httpHeaders.bodyStartIndex = newStart;
-        byte[] rawFile = Arrays.copyOfRange(request.sharedArray,
-                                httpHeaders.bodyStartIndex, httpHeaders.bodyStartIndex + httpHeaders.contentLength);
-
-        System.out.println("[" + filename +"]\nContent-Lenght: " + rawFile.length);
+        var tokenParsed = Authorizer.authorize(request.headers.token);
+        if(tokenParsed == null)
+            return new Response(401);
 
         try {
-            Path imgPath = StorageService.store(rawFile, filename);
-            var res = UserService.addImage(id, imgPath);
-            if(res.status == 200)
-                response.writeToMessage(StorageService.cache.createResponseBuffer(
-                                                                            FileInfo.json( res.json.getBytes() )));
-            else
-                response.writeToMessage(StorageService.cache.get("404").duplicate() );
+            int id = Integer.parseInt(tokenParsed.get("sub"));
 
+            if(!request.other.containsKey("filename"))
+                return new Response(400);
+
+            String filename = request.other.get("filename");
+
+
+            Path imgPath = StorageService.store((byte[])request.payload, filename);
+            return UserService.addImage(id, imgPath);
+
+        } catch (NumberFormatException e) {
+            return new Response(401);
         } catch (IOException e) {
             e.printStackTrace();
-            response.writeToMessage(StorageService.cache.get("500").duplicate());
+            return new Response(500);
         }
 
     }
-
-    
 }

@@ -1,9 +1,8 @@
 package server.routes;
 
-import server.Message;
+import server.utils.Response;
 
 public interface IController {
-    void get(Message request, Message response);
-    void post(Message request, Message response);
-    //void put();
+
+    Response handle(Object request);
 }

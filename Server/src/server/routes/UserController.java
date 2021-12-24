@@ -1,17 +1,11 @@
 package server.routes;
 
-import server.Message;
-import server.http.HttpHeaders;
+import server.http.HttpRequest;
 import server.security.Authorizer;
-import server.services.StorageService;
 import server.services.UserService;
 import server.services.Validator;
-import server.utils.FileInfo;
 import server.utils.Json;
 import server.utils.Response;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public class UserController implements IController {
     private static final String routeRoot = "/users";
@@ -19,86 +13,73 @@ public class UserController implements IController {
     }
 
     @Override
-    public void get(Message request, Message response) {
-        var httpMeta = (HttpHeaders)request.metaData;
-        String url = httpMeta.url.substring(routeRoot.length());
+    public Response handle(Object request) {
+        return handleHttp((HttpRequest) request);
+    }
 
-        switch (url) {
+    private Response handleHttp(HttpRequest request) {
+        switch (request.headers.httpMethod) {
+            case GET:  { return get(request); }
+            case POST: { return post(request); }
+            //case HEAD:
+            //case PUT:
+            //case DELETE: { response.writeToMessage(StorageService.cache.get("501").duplicate());  break; }
+            default: {    return new Response(405); }
+        }
+    }
+
+    private Response get(HttpRequest request) {
+        switch (request.headers.url) {
             case "/getAll": {
-                if(httpMeta.token == null) {
-                    response.writeToMessage(StorageService.cache.get("401").duplicate());
-                    return;
-                }
-                Json token = new Json(Authorizer.parseToken(httpMeta.token));
+                if(request.headers.token == null)
+                    return new Response(401);
 
-                if(token == null) {
-                    response.writeToMessage(StorageService.cache.get("401").duplicate());
-                    return;
-                }
+                Json token = Json.parseJSON(Authorizer.parseToken(request.headers.token));
+
+                if(token == null)
+                    return new Response(401);
+
 
                 int id = Integer.parseInt(token.get("sub"));
-                if(id <= 0) { response.writeToMessage(StorageService.cache.get("403").duplicate()); return; }
+                if(id <= 0) { return new Response(403); }
                 var users = UserService.getAll(id);
-                if(users == null) { response.writeToMessage(StorageService.cache.get("403").duplicate()); return; }
+                if(users == null) { return new Response(403); }
                 StringBuilder sb = new StringBuilder("[");
                 for(var u : users)
                     sb.append(u).append(',');
                 sb.setCharAt(sb.length()-1, ']');
                 System.out.println(sb);
 
-                response.writeToMessage(StorageService.cache.createResponseBuffer(FileInfo.json(
-                        StandardCharsets.UTF_8, sb.toString().getBytes())));
-                return;
+                Json jsonArray = new Json();
+                jsonArray.put("jsonArray", sb.toString());
+
+                return new Response(200, jsonArray);
             }
-            default: response.writeToMessage(StorageService.cache.get("501").duplicate());
+            default: return new Response(501);
         }
     }
 
-    @Override
-    public void post(Message request, Message response) {
-        var httpMeta = (HttpHeaders)request.metaData;
-        String url = httpMeta.url.substring(routeRoot.length());
-
-        Json reqBody = new Json( new String( Arrays.copyOfRange(request.sharedArray,
-                                                    httpMeta.bodyStartIndex,
-                                                    httpMeta.bodyEndIndex) )
-                                );
-
-
-        switch (url) {
+    private Response post(HttpRequest request) {
+        Json reqBody = (Json)request.payload;
+        switch (request.headers.url) {
             case "/authenticate": {
-                if(!Validator.validateSchema(reqBody, new String[]{"email", "password"})) {
-                    response.writeToMessage(StorageService.cache.createBadRequest(reqBody.get("error")).duplicate());
-                    return;
-                }
+                if(!Validator.validateSchema(reqBody, new String[]{"email", "password"}))
+                    return new Response(400, "\"msg:\":\"" + reqBody.get("error") + '\"');
 
-                Response res = UserService.authenticate(reqBody.get("email"), reqBody.get("password"));
-                if(res.status == 404) {
-                    response.writeToMessage(StorageService.cache.get("404").duplicate());
-                    return;
-                }
 
-                response.writeToMessage(StorageService.cache.createResponseBuffer(FileInfo.json(
-                                                                        StandardCharsets.UTF_8, res.json.getBytes())));
-                break;
+                return UserService.authenticate(reqBody.get("email"), reqBody.get("password"));
             }
 
             case "/register": {
                 if(!Validator.validateSchema(reqBody, new String[]{"name", "birthday", "gender",
                         "interest", "email", "password"})) {
-                    response.writeToMessage(StorageService.cache.createBadRequest("Missing key: \""
-                                                                            + reqBody.get("error") + "\""));
-                    return;
+                    return new Response(400, "\"msg:\":\"" +
+                            "Missing key: \"" + reqBody.get("error") + "\"");
                 }
 
-                Response res = UserService.register(reqBody);
-                response.writeToMessage(StorageService.cache.createResponseBuffer(FileInfo.json(
-                                                                    StandardCharsets.UTF_8, res.json.getBytes())));
-                break;
+                return UserService.register(reqBody);
             }
-            default: response.writeToMessage(StorageService.cache.get("501").duplicate());
+            default: return new Response(501);
         }
-
-
     }
 }

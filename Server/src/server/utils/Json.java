@@ -31,7 +31,12 @@ public class Json {
     public boolean hasKey(String key) { return jsonObj.containsKey(key); }
 
     public static Json parseJSON(String data) {
-        return new Json(data);
+        if(data == null)
+            return null;
+        var parsed = new Json(data);
+        if(parsed.getSize() == 0)
+            return null;
+        return parsed;
     }
 
     public int getSize() { return jsonObj.size(); }

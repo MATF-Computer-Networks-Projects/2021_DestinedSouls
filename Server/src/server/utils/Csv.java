@@ -1,10 +1,11 @@
 package server.utils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
-
-import server.models.users.User;
 
 public class Csv {
     public Csv(String csvPath) { path = csvPath; openStream();}

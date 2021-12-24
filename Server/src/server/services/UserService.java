@@ -97,13 +97,13 @@ public class UserService {
         User user = getIf(user1 -> user1.email.equals(reqEmail));
         if(user == null) {
             System.out.println("User does not exist");
-            return new Response(404,null);
+            return new Response(404);
         }
 
         if(Arrays.hashCode(Authorizer.encrypt(reqPassword)) == Arrays.hashCode(user.hash))
             return new Response(200, omitHash(user, Authorizer.token(user.id)));
 
-        return new Response(401, null);
+        return new Response(401);
     }
 
     /**
@@ -114,7 +114,7 @@ public class UserService {
      */
     public static Response register(Json user) {
         if(getIf(user1 -> user1.email.equals(user.get("email"))) != null)
-            return new Response(403, null);
+            return new Response(403);
         User newUser = userFromJson(user);
         inMemUserTable.add(newUser);
         return new Response(200, omitHash(newUser, Authorizer.token(newUser.id)) );
@@ -123,8 +123,10 @@ public class UserService {
     public static Response addImage(int id, Path imagePath) {
         var user = getById(id);
         if(user == null)
-            return new Response(404, null);
+            return new Response(404);
         user.setImage(imagePath);
-        return new Response(200, "{\"filename\":\"" + imagePath + "\"}");
+
+        String strPath = StorageService.uploadsDir.toString() + "/" + imagePath.getFileName();
+        return new Response(200, "{\"img\":\"" + strPath + "\"}");
     }
 }
