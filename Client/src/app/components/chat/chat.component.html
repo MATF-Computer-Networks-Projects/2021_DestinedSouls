@@ -1,6 +1,7 @@
-<mat-drawer-container class = "chatMenu">
+<mat-drawer-container *ngIf="displayOnline" class = "chatMenu">
     <mat-drawer mode="side" opened>
         <br>
+        <button (click)="toHome()" > Home </button><br>
         <button (click)="addOnline()" class="btnOnline" ><a style="color: #00af2e">  •</a> Who is online? </button><br>
     <div *ngIf="displayOnline; else noOnline" >
       <div *ngFor="let user of usersNames ">

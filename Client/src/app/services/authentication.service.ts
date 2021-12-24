@@ -34,9 +34,7 @@ export class AuthenticationService {
   logout() {
     // remove user from local storage and set current user to null
     localStorage.removeItem('currentUser');
-    return this.http.delete(`/users/${this.currentUserSubject.getValue().id}`);
-    //FIXME: ovaj deo koda se ne izvrsava
-    this.currentUserSubject.next(null);
+    return this.http.delete(`/users/${this.currentUserSubject.getValue().id}`).pipe();
   }
 
 }

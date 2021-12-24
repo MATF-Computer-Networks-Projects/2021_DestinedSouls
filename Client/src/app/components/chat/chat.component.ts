@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {MatTabsModule} from '@angular/material/tabs';
 import {AuthenticationService, UserService} from "../../services";
 import {Router} from "@angular/router";
 import { User } from 'src/app/models';
-import {BehaviorSubject, Observable, Observer, Subject, Subscribable} from "rxjs";
-import {map} from "rxjs/operators";
 
 @Component({
   selector: 'app-chat',
@@ -14,7 +11,7 @@ import {map} from "rxjs/operators";
 
 export class ChatComponent implements OnInit{
 
-  onlineUsers: string[] = ['Aleksa','Djordje','Petar'];
+  onlineUsers: string[] = [];
   usersArray : User[];
   usersNames : string[] = [];
   chatActiveWith : string;
@@ -23,7 +20,9 @@ export class ChatComponent implements OnInit{
 
   constructor(private authenticationService: AuthenticationService,
               private userService: UserService,
-              private router: Router) { }
+              private router: Router) {
+    this.addOnline();
+  }
 
   ngOnInit(): void {
 
@@ -46,8 +45,14 @@ export class ChatComponent implements OnInit{
         this.usersArray.map( user => {
           if(!this.usersNames.includes(user.name))
               this.usersNames.push(user.name); });
-        console.log("neko se ulogovao!");
+        console.log("New login!");
+        this.displayOnline=true;
+      }, error => {
         this.displayOnline=true;
       });
+  }
+
+  toHome() {
+    this.router.navigateByUrl('/');
   }
 }

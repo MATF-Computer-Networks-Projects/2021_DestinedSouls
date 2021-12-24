@@ -15,10 +15,6 @@ export class UserService {
     return this.http.post<User>('/users/register', user);
   }
 
-  getAll(): Observable<User[]> {
-    return this.http.get<User[]>('/users/getAll');
-  }
-
   getOnline(): Observable<User[]> {
     return this.http.get<User[]>('/users/getOnline');
   }

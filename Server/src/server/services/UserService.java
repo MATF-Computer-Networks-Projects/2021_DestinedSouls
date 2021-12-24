@@ -54,7 +54,7 @@ public class UserService {
     public static List<User> getOnline(int id) {
         if(inMemUserTable.hasId(id))
         {
-            return new LinkedList<User>(inMemUserTableOnline.getAll());
+            return getAll(user -> user.id != id);
         }
         return null;
     }
@@ -66,6 +66,15 @@ public class UserService {
         }
 
         return null;
+    }
+
+
+    private static List<User> getAll(Predicate<User> p) {
+        var users = new LinkedList<User>();
+        for(User user : inMemUserTable.getAll())
+            if(p.test(user))
+                users.add(user);
+        return users;
     }
 
     /*
