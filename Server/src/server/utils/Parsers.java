@@ -4,15 +4,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parsers {
-    public static String jsonRegex = "\"([a-zA-Z0-9]+)\":\"([a-zA-Z0-9\\-.@]+)\"";
+    public static String jsonRegex = "\"([a-zA-Z0-9]+)\":\"([a-zA-Z0-9\\-.@<>:,=!#$%^&*()_+/]+)\"";
     public static Pattern jsonPattern = Pattern.compile(jsonRegex);
 
     public static String csvRegex = "(?:,|\\n|^)(\"(?:(?:\"\")*[^\"]*)*\"|[^\",\\n]*|(?:\\n|$))";
     public static Pattern csvPattern = Pattern.compile(csvRegex);
 
-    /*
-    * Authorization: Bearer ynRs+M+fdAQx5lHBIaL/t5KkE1GFy+yTpVfjuBi3xjU=
-    * */
+
     private static String authTokenRegex = "[Aa]uthorization: [Bb]earer (.*)\r\n";
     private static Pattern authTokenPattern = Pattern.compile(authTokenRegex);
     public static String parseToken(String request) {

@@ -32,7 +32,7 @@ public final class Responses {
         for (Path p : Files.newDirectoryStream(publicHtmlDir)) {
             if (Files.isRegularFile(p)) {
                 FileInfo fi = FileInfo.get(p, StandardCharsets.UTF_8);
-                ByteBuffer responseBuffer = this.createResponseBuffer(fi);
+                ByteBuffer responseBuffer = createResponseBuffer(fi);
                 this.responseBuffers.put(p.getFileName().toString(), responseBuffer);
             }
         }
@@ -49,7 +49,7 @@ public final class Responses {
     }
 
 
-    public ByteBuffer createResponseBuffer(FileInfo fi) {
+    public static ByteBuffer createResponseBuffer(FileInfo fi) {
         ByteBuffer data = fi.getData();
         String header = "HTTP/1.1 200 OK\r\n"
                 + "Server: DestSoulsServer v1.0\r\n"
@@ -91,7 +91,7 @@ public final class Responses {
         return nfBuffer;
     }
 
-    public ByteBuffer createBadRequest(String msg) {
+    public static ByteBuffer createBadRequest(String msg) {
         byte[] nfHeaderData = ("HTTP/1.1 400 Bad Request\r\nServer: DestSoulsServer v1.0\r\n\r\n")
                 .getBytes(StandardCharsets.UTF_8);
         if(msg.startsWith("\"msg\":"))
@@ -170,7 +170,13 @@ public final class Responses {
         return this.responseBuffers.get(key);
     }
 
+    // TODO: Add int keys
+
     public boolean contains(String buffer) {
         return this.responseBuffers.containsKey(buffer);
+    }
+
+    public void put(String key, ByteBuffer buffer) {
+        this.responseBuffers.put(key, buffer);
     }
 }

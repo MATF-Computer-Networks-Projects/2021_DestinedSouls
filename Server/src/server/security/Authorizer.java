@@ -1,9 +1,6 @@
 package server.security;
 
-import server.models.users.User;
-import server.services.UserService;
 import server.utils.Json;
-import server.utils.Parsers;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -94,20 +91,18 @@ public class Authorizer {
         return Base64.getEncoder().encodeToString(encrypt(json.toString()));
     }
 
-    public static User authorize(String request) {
-        String token = Parsers.parseToken(request);
+    public static Json authorize(String token) {
         if(token == null)
             return null;
-        Json user = new Json(parseToken(token));
-        if(user == null) {
+        Json user = Json.parseJSON(parseToken(token));
+        if( user == null ||
+            !user.hasKey("sub") ||
+            !user.hasKey("date") ||
+            (System.currentTimeMillis() - Long.decode(user.get("date"))) > 360000000
+        )
             return null;
-        }
-        System.err.println("User: " + user);
-        int id = Integer.decode(user.get("sub"));
-        System.err.println("User: " + id);
-        if(user.hasKey("date") && ((System.currentTimeMillis() - Long.decode(user.get("date"))) <= 360000000) )
-            return UserService.getById( id );
-        return null;
+
+        return user;
     }
 
     public static String parseToken(String token) {

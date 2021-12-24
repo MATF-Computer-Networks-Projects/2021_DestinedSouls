@@ -1,6 +1,9 @@
 package server.http;
 
-import server.*;
+import server.IMessageReader;
+import server.Message;
+import server.MessageBuffer;
+import server.Socket;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
