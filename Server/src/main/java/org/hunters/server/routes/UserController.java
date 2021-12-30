@@ -1,11 +1,11 @@
 package org.hunters.server.routes;
 
-import org.hunters.server.http.HttpRequest;
+import org.hunters.server.protocols.http.HttpRequest;
+import org.hunters.server.security.Authorizer;
+import org.hunters.server.services.UserService;
 import org.hunters.server.services.Validator;
 import org.hunters.server.utils.Json;
 import org.hunters.server.utils.Response;
-import org.hunters.server.security.Authorizer;
-import org.hunters.server.services.UserService;
 
 public class UserController implements IController {
     private static final String routeRoot = "/users";

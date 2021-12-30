@@ -18,6 +18,8 @@ public class Authorizer {
     private static Cipher decryptor = null;
     private static String algorithm = "SHA-256";
     private static String secret = "0ac0f797-c86b-43fd-8c17-84c1bc83725b";
+    private static final String wsAlgorithm = "SHA-1";
+    private static final String wsGuid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
 
     private Authorizer() {}
@@ -80,6 +82,10 @@ public class Authorizer {
         return new String(decryptor.doFinal(hash), StandardCharsets.UTF_8);
     }
 
+    private static String encodeToString(String passphrase) {
+        return Base64.getEncoder().encodeToString(encrypt(passphrase));
+    }
+
     public static String token(int id) {
         Json json = new Json();
         json.put("sub", Integer.toString(id));
@@ -119,5 +125,16 @@ public class Authorizer {
 
     public static String parseToken(byte[] token) {
         return parseToken(new String(token));
+    }
+
+    public static String wsAccept(String key) {
+        try {
+            return Base64.getEncoder().encodeToString(
+                    MessageDigest.getInstance(wsAlgorithm).digest((key + wsGuid)
+                                    .getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

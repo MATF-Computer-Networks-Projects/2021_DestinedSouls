@@ -1,11 +1,11 @@
 package org.hunters.server.services;
 
+import org.hunters.server.models.users.User;
+import org.hunters.server.models.users.UserTable;
 import org.hunters.server.security.Authorizer;
 import org.hunters.server.utils.Csv;
 import org.hunters.server.utils.Json;
 import org.hunters.server.utils.Response;
-import org.hunters.server.models.users.User;
-import org.hunters.server.models.users.UserTable;
 
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;

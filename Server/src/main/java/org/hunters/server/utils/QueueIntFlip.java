@@ -1,4 +1,4 @@
-package org.hunters.server;
+package org.hunters.server.utils;
 
 /**
  * Same as QueueFillCount, except that QueueFlip uses a flip flag to keep track of when the internal writePos has

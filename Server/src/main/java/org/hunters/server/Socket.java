@@ -10,7 +10,7 @@ public class Socket {
     public long socketId;
 
     public SocketChannel  socketChannel = null;
-    public IMessageReader messageReader = null;
+    public MessageReader  messageReader = null;
     public MessageWriter  messageWriter = null;
 
     public boolean endOfStreamReached = false;

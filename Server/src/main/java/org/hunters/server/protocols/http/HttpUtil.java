@@ -1,5 +1,8 @@
-package org.hunters.server.http;
+package org.hunters.server.protocols.http;
 
+
+import org.hunters.server.Message;
+import org.hunters.server.utils.Json;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -36,8 +39,8 @@ public class HttpUtil {
         //parse HTTP headers
         int prevEndOfHeader = endOfFirstLine + 1;
         int endOfHeader = findNextLineBreak(src, prevEndOfHeader, endIndex);
-
-        while(endOfHeader != -1 && endOfHeader != prevEndOfHeader + 1){
+        HttpHeaders.HttpWsHeaders wsHeaders = new HttpHeaders.HttpWsHeaders();
+        while(endOfHeader != -1 && endOfHeader != prevEndOfHeader + 1) {
 
             if(matches(src, prevEndOfHeader, "content-length")){
                 try {
@@ -46,14 +49,22 @@ public class HttpUtil {
                     e.printStackTrace();
                 }
             }
-            if(matches(src, prevEndOfHeader, "authorization"))
+            else if(matches(src, prevEndOfHeader, "authorization"))
                 resolveAuthToken(src, prevEndOfHeader, endIndex, httpHeaders);
-            if(matches(src, prevEndOfHeader, "content-type"))
+            else if(matches(src, prevEndOfHeader, "content-type"))
                 resolveContentType(src, prevEndOfHeader, endIndex, httpHeaders);
+            else if(matches(src, prevEndOfHeader, "sec-")) {
+                if(matches(src, prevEndOfHeader, "sec-websocket-key"))
+                    wsHeaders.key = new String(getHeaderValue(src, prevEndOfHeader, endIndex), StandardCharsets.UTF_8);
+                else if(matches(src, prevEndOfHeader, "sec-websocket-protocol"))
+                    wsHeaders.protocol = new String(getHeaderValue(src, prevEndOfHeader, endIndex), StandardCharsets.UTF_8);
+            }
 
             prevEndOfHeader = endOfHeader + 1;
             endOfHeader = findNextLineBreak(src, prevEndOfHeader, endIndex);
         }
+        if(wsHeaders.isValid())
+            httpHeaders.ws = wsHeaders;
 
         if(endOfHeader == -1){
             return -1;
@@ -76,40 +87,19 @@ public class HttpUtil {
     }
 
     private static void findContentLength(byte[] src, int startIndex, int endIndex, HttpHeaders httpHeaders) throws UnsupportedEncodingException {
-        int indexOfColon = findNext(src, startIndex, endIndex, (byte) ':');
-
-        //skip spaces after colon
-        int index = indexOfColon +1;
-        while(src[index] == ' '){
-            index++;
-        }
+        int index = getValueStartIndex(src, startIndex, endIndex);
 
         int valueStartIndex = index;
-        int valueEndIndex   = index;
         boolean endOfValueFound = false;
 
         while(index < endIndex && !endOfValueFound){
-            switch(src[index]){
-                case '0' : ;
-                case '1' : ;
-                case '2' : ;
-                case '3' : ;
-                case '4' : ;
-                case '5' : ;
-                case '6' : ;
-                case '7' : ;
-                case '8' : ;
-                case '9' : { index++;  break; }
-
-                default: {
-                    endOfValueFound = true;
-                    valueEndIndex = index;
-                }
-            }
+            if(src[index] >= '0' && src[index] <= '9')
+                ++index;
+            else
+                endOfValueFound = true;
         }
 
-        httpHeaders.contentLength = Integer.parseInt(new String(src, valueStartIndex, valueEndIndex - valueStartIndex, "UTF-8"));
-
+        httpHeaders.contentLength = Integer.parseInt(new String(src, valueStartIndex, index - valueStartIndex));
     }
 
 
@@ -227,5 +217,60 @@ public class HttpUtil {
             return null;
 
         return new String(Arrays.copyOfRange(src,startIndex, endIndex), StandardCharsets.UTF_8);
+    }
+
+    public static void resolvePayload(Message request, HttpRequest httpRequest) {
+        if(httpRequest.headers.contentType.startsWith("multipart")) {
+            resolveMultipart(request, httpRequest);
+            return;
+        }
+        httpRequest.payload = new Json( new String( Arrays.copyOfRange(request.sharedArray,
+                                                    httpRequest.headers.bodyStartIndex,
+                                                    httpRequest.headers.bodyEndIndex)
+                                                   ));
+    }
+
+    private static void resolveMultipart(Message request, HttpRequest httpRequest) {
+        var httpHeaders = httpRequest.headers;
+
+        int boundaryLength = httpHeaders.contentType.length() - httpHeaders.contentType.indexOf("----");
+        httpHeaders.bodyStartIndex += boundaryLength + 2; // +2 for CRLF
+        httpHeaders.bodyEndIndex -= boundaryLength + 2; // +2 for CRLF
+        httpHeaders.contentLength -= 2 * boundaryLength + 4;
+
+        int filenameIndex = HttpUtil.findNext(request.sharedArray,
+                httpHeaders.bodyStartIndex, httpHeaders.bodyEndIndex, "filename=") + 10;
+        int endLine = HttpUtil.findNextLineBreak(request.sharedArray, filenameIndex, httpHeaders.bodyEndIndex)-2; // "CR
+
+        var filename = HttpUtil.sliceAsString(request.sharedArray, filenameIndex, endLine);
+        httpRequest.other.put("filename", filename);
+
+        endLine += 3;
+
+        int newStart = HttpUtil.findNext(request.sharedArray, endLine, httpHeaders.bodyEndIndex, "\r\n\r\n") + 4;
+
+        httpHeaders.contentLength -= newStart - httpHeaders.bodyStartIndex + 6;
+
+        httpHeaders.bodyStartIndex = newStart;
+        httpRequest.payload = Arrays.copyOfRange(request.sharedArray,
+                httpHeaders.bodyStartIndex, httpHeaders.bodyStartIndex + httpHeaders.contentLength);
+    }
+
+    private static int getValueStartIndex(byte[] src, int startIndex, int endIndex) {
+        int index = findNext(src, startIndex, endIndex, (byte) ':');
+        if(index == -1)
+            return -1;
+        //skip spaces after colon
+        ++index;
+        while(src[index] == ' ')
+            ++index;
+
+        return index;
+    }
+
+    private static byte[] getHeaderValue(byte[] src, int startIndex, int endIndex) {
+        startIndex = getValueStartIndex(src, startIndex, endIndex);
+        endIndex = findNextLineBreak(src, startIndex, endIndex) - 1;
+        return Arrays.copyOfRange(src,startIndex, endIndex);
     }
 }

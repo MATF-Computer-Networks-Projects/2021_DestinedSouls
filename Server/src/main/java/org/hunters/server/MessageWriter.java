@@ -24,6 +24,11 @@ public class MessageWriter {
     }
 
     public void write(Socket socket, ByteBuffer byteBuffer) throws IOException {
+        if(this.messageInProgress.length - this.bytesWritten + 1 < 0) {
+            this.messageInProgress.length -= 1;
+            this.bytesWritten = 0;
+        }
+
         byteBuffer.put(this.messageInProgress.sharedArray, this.messageInProgress.offset + this.bytesWritten, this.messageInProgress.length - this.bytesWritten + 1);
         byteBuffer.flip();
 
@@ -36,11 +41,14 @@ public class MessageWriter {
             } else {
                 this.messageInProgress = null;
             }
+            this.bytesWritten = 0;
         }
     }
 
     public boolean isEmpty() {
         return this.writeQueue.isEmpty() && this.messageInProgress == null;
     }
+
+
 
 }

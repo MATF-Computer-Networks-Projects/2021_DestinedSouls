@@ -1,4 +1,4 @@
-package org.hunters.server.http;
+package org.hunters.server.protocols.http;
 
 import java.util.HashMap;
 import java.util.Map;

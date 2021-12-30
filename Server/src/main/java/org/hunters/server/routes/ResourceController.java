@@ -1,6 +1,6 @@
 package org.hunters.server.routes;
 
-import org.hunters.server.http.HttpRequest;
+import org.hunters.server.protocols.http.HttpRequest;
 import org.hunters.server.security.Authorizer;
 import org.hunters.server.services.StorageService;
 import org.hunters.server.services.UserService;
