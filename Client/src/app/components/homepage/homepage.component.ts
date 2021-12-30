@@ -29,7 +29,9 @@ export class HomepageComponent implements OnInit {
       error => {
         console.error(error);
       });
+  }
 
-
+  onChat() {
+    this.router.navigateByUrl('/chat');
   }
 }
