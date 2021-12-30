@@ -7,18 +7,19 @@ import java.nio.channels.SocketChannel;
 import java.util.Queue;
 
 
-public class SocketAccepter implements Runnable{
+public class SocketAcceptor implements Runnable{
 
     private int port = 0;
     private ServerSocketChannel serverSocket = null;
 
     private Queue<Socket> socketQueue = null;
 
-    public SocketAccepter(int tcpPort, Queue<Socket> socketQueue)  {
+    public SocketAcceptor(int tcpPort, Queue<Socket> socketQueue)  {
         this.port     = tcpPort;
         this.socketQueue = socketQueue;
     }
 
+    @Override
     public void run() {
         try{
             this.serverSocket = ServerSocketChannel.open();

@@ -10,25 +10,27 @@ import java.nio.channels.Selector;
 import java.util.*;
 
 
-public class SocketProcessor implements Runnable {
+// public class SocketProcessor implements Runnable {
+public class SocketProcessor {
 
     private Queue<Socket>  inboundSocketQueue   = null;
 
     private MessageBuffer  readMessageBuffer    = null;
     private MessageBuffer  writeMessageBuffer   = null;
 
-    private IMessageReaderFactory messageReaderFactory = null;
+    private MessageReaderFactory messageReaderFactory = null;
 
     private Queue<Message> outboundMessageQueue = new LinkedList<>();
 
-    private Map<Long, Socket> socketMap         = new HashMap<>();
+    private final Map<Long, Socket> socketMap         = new HashMap<>();
+    // private final Map<Long, WsImpl> webSocketMap      = new HashMap<>();
 
-    private ByteBuffer readByteBuffer  = ByteBuffer.allocate(1024 * 1024);
-    private ByteBuffer writeByteBuffer = ByteBuffer.allocate(1024 * 1024);
+    private final ByteBuffer readByteBuffer  = ByteBuffer.allocate(1024 * 1024);
+    private final ByteBuffer writeByteBuffer = ByteBuffer.allocate(1024 * 1024);
     private Selector   readSelector    = null;
     private Selector   writeSelector   = null;
 
-    private IMessageProcessor messageProcessor = null;
+    private MessageProcessor  messageProcessor = null;
     private WriteProxy        writeProxy       = null;
 
     private long              nextSocketId = 16 * 1024; //start incoming socket ids from 16K - reserve bottom ids for pre-defined sockets (servers).
@@ -39,7 +41,7 @@ public class SocketProcessor implements Runnable {
     private long       cacheTimeout;
     private final long cacheTtl = 5000;
 
-    public SocketProcessor(Queue<Socket> inboundSocketQueue, MessageBuffer readMessageBuffer, MessageBuffer writeMessageBuffer, IMessageReaderFactory messageReaderFactory, IMessageProcessor messageProcessor) throws IOException {
+    public SocketProcessor(Queue<Socket> inboundSocketQueue, MessageBuffer readMessageBuffer, MessageBuffer writeMessageBuffer, MessageReaderFactory messageReaderFactory, MessageProcessor messageProcessor) throws IOException {
         this.inboundSocketQueue   = inboundSocketQueue;
 
         this.readMessageBuffer    = readMessageBuffer;
@@ -66,6 +68,11 @@ public class SocketProcessor implements Runnable {
                 }
 
                 executeCycle();
+                /*
+                for(WsImpl ws : webSocketMap.values())
+                    ;
+                 */
+
             } catch(IOException e){
                 e.printStackTrace();
             }
@@ -118,6 +125,7 @@ public class SocketProcessor implements Runnable {
             }
             selectedKeys.clear();
         }
+
     }
 
     private void readFromSocket(SelectionKey key) throws IOException {
@@ -127,8 +135,14 @@ public class SocketProcessor implements Runnable {
         List<Message> fullMessages = socket.messageReader.getMessages();
         if(fullMessages.size() > 0){
             for(Message message : fullMessages){
-                message.socketId = socket.socketId;
+                message.socketId = socket.socketId; // TODO: add protocol too
                 this.messageProcessor.process(message, this.writeProxy);  //the message processor will eventually push outgoing messages into an IMessageWriter for this socket.
+                /*
+                if(socket.protocol == Protocol.WS && !this.webSocketMap.containsKey(socket.socketId)) {
+                    socket.messageReader = new WsMessageReader(socket.messageReader);
+                    this.socketMap.remove(socket.socketId);
+                    this.webSocketMap.put(socket.socketId, new WsImpl(socket));
+                }*/
             }
             fullMessages.clear();
         }
@@ -203,7 +217,7 @@ public class SocketProcessor implements Runnable {
                 if(messageWriter.isEmpty()){
                     messageWriter.enqueue(outMessage);
                     nonEmptyToEmptySockets.remove(socket);
-                    emptyToNonEmptySockets.add(socket);    // just in case
+                    emptyToNonEmptySockets.add(socket);
                 } else{
                    messageWriter.enqueue(outMessage);
                 }
@@ -212,5 +226,8 @@ public class SocketProcessor implements Runnable {
             outMessage = this.outboundMessageQueue.poll();
         }
     }
+
+
+
 
 }

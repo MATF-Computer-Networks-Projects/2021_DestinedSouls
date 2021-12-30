@@ -1,6 +1,7 @@
 package org.hunters.server;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 
 public class Message {
@@ -14,7 +15,7 @@ public class Message {
     public int    capacity    = 0; //the size of the section in the sharedArray allocated to this message.
     public int    length      = 0; //the number of bytes used of the allocated section.
 
-    public Object metaData    = null;
+    public MessageMetaData metaData = null;
 
     public Message(MessageBuffer messageBuffer) {
         this.messageBuffer = messageBuffer;
@@ -29,7 +30,6 @@ public class Message {
     public int writeToMessage(ByteBuffer byteBuffer) {
         int remaining = byteBuffer.remaining();
 
-        // while(this.length + remaining > capacity){
         while(this.length + remaining > capacity){
             if(!this.messageBuffer.expandMessage(this)) {
                 return -1;
@@ -95,7 +95,9 @@ public class Message {
     }
 
     public int writeToByteBuffer(ByteBuffer byteBuffer){
-        return 0;
+        byte[] copyArr = Arrays.copyOfRange(this.sharedArray, this.offset, this.offset + this.length);
+        byteBuffer.put(copyArr);
+        return this.length;
     }
 
 

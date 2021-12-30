@@ -1,6 +1,6 @@
 package org.hunters.server.routes;
 
-import org.hunters.server.http.HttpRequest;
+import org.hunters.server.protocols.http.HttpRequest;
 import org.hunters.server.utils.Response;
 
 import java.util.HashMap;
@@ -27,8 +27,12 @@ public class Router {
         String route = idx == -1 ? request.headers.url : request.headers.url.substring(0, idx);
         request.headers.url = idx == -1 ? request.headers.url : request.headers.url.substring(route.length());
 
-        if(!routes.containsKey(route) && route.indexOf('.') != -1)
-            return ResourceController.get(request.headers.url);
+        if(!routes.containsKey(route)) {
+            if(route.indexOf('.') != -1)
+                return ResourceController.get(request.headers.url);
+            else
+                return new Response(404);
+        }
 
         return routes.get(route).handle(request);
     }

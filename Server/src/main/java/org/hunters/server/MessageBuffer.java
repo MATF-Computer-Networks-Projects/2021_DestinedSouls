@@ -1,5 +1,7 @@
 package org.hunters.server;
 
+import org.hunters.server.utils.QueueIntFlip;
+
 /**
  * A shared buffer which can contain many messages inside. A message gets a section of the buffer to use. If the
  * message outgrows the section in size, the message requests a larger section and the message is copied to that
@@ -47,7 +49,8 @@ public class MessageBuffer {
 
         message.sharedArray = this.smallMessageBuffer;
         message.capacity    = CAPACITY_SMALL;
-        message.offset      = nextFreeSmallBlock;
+        // message.offset      = nextFreeSmallBlock;
+        message.offset      = 0;
         message.length      = 0;
 
         return message;

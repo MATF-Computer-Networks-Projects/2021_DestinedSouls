@@ -1,5 +1,7 @@
 package org.hunters.server.utils;
 
+import org.hunters.server.security.Authorizer;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -11,7 +13,7 @@ import java.util.Map;
 
 public final class Responses {
     private Map<String, ByteBuffer> responseBuffers;
-    private Path publicHtmlDir;
+    private final Path publicHtmlDir;
 
     public Responses(String pathDir, Map<String, ByteBuffer> cache) {
         this.responseBuffers = cache;
@@ -61,6 +63,20 @@ public final class Responses {
         buf.put(data);
         buf.flip();
         return buf;
+    }
+
+    public static ByteBuffer createSwitchingProtocols(String key) {
+        byte[] nfHeaderData = ("HTTP/1.1 101 Web Socket Switching Protocols\r\n"
+                + "Connection: Upgrade\r\n"
+                + "Upgrade: websocket\r\n"
+                + "Sec-WebSocket-Accept: " + Authorizer.wsAccept(key) + "\r\n"
+                // + "Sec-WebSocket-Protocol: " + ws.protocol + "\r\n"
+                + "\r\n"
+                ).getBytes(StandardCharsets.UTF_8);
+        ByteBuffer bufHeader = ByteBuffer.allocate(nfHeaderData.length);
+        bufHeader.put(nfHeaderData);
+        bufHeader.flip();
+        return bufHeader;
     }
 
     public ByteBuffer createHeaderOnlyBuf(String file) {

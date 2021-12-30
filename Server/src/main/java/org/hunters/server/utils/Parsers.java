@@ -4,15 +4,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parsers {
-    public static String jsonRegex = "\"([a-zA-Z0-9]+)\":\"([a-zA-Z0-9\\-.@<>:,=!#$%^&*()_+/]+)\"";
-    public static Pattern jsonPattern = Pattern.compile(jsonRegex);
+    public static final String jsonRegex = "\"([a-zA-Z0-9]+)\":\"([a-zA-Z0-9\\-.@<>:,=!#$%^&*()_+/]+)\"";
+    public static final Pattern jsonPattern = Pattern.compile(jsonRegex);
 
-    public static String csvRegex = "(?:,|\\n|^)(\"(?:(?:\"\")*[^\"]*)*\"|[^\",\\n]*|(?:\\n|$))";
-    public static Pattern csvPattern = Pattern.compile(csvRegex);
+    public static final String csvRegex = "(?:,|\\n|^)(\"(?:(?:\"\")*[^\"]*)*\"|[^\",\\n]*|(?:\\n|$))";
+    public static final Pattern csvPattern = Pattern.compile(csvRegex);
 
 
-    private static String authTokenRegex = "[Aa]uthorization: [Bb]earer (.*)\r\n";
-    private static Pattern authTokenPattern = Pattern.compile(authTokenRegex);
+    private static final String authTokenRegex = "[Aa]uthorization: [Bb]earer (.*)\r\n";
+    private static final Pattern authTokenPattern = Pattern.compile(authTokenRegex);
     public static String parseToken(String request) {
         Matcher matcher = authTokenPattern.matcher(request);
         if(matcher.find()) {
@@ -22,7 +22,7 @@ public class Parsers {
         return null;
     }
 
-    private static Pattern fileUploadPattern = Pattern.compile("filename=\"(.*\\.[a-z]+)\"");
+    private static final Pattern fileUploadPattern = Pattern.compile("filename=\"(.*\\.[a-z]+)\"");
     public static String getFilename(String data) {
         Matcher matcher = authTokenPattern.matcher(data);
         if(matcher.find()) {
