@@ -4,6 +4,7 @@
 /dist
 /tmp
 /out-tsc
+**/target
 # Only exists if Bazel was run
 /bazel-out
 
@@ -46,9 +47,11 @@ testem.log
 .DS_Store
 Thumbs.db
 
-Client/.angular
-Client/node_modules
-Client/dist
-Client/tmp
+[Cc]lient/.angular
+[Cc]lient/node
+[Cc]lient/node_modules
+[Cc]lient/dist
+[Cc]lient/tmp
 
-public_*
+**/[Pp]ublic_*
+
