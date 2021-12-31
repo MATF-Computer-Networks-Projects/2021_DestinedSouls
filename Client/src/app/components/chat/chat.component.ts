@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import {AuthenticationService, UserService} from "../../services";
+import { Observable, Subscription } from 'rxjs'
+import {catchError, map} from 'rxjs/operators'
 import {Router} from "@angular/router";
-import { User } from 'src/app/models';
+import {AuthenticationService, ChatService, UserService} from "src/app/services";
+
+import { User, Message } from "src/app/models";
 
 @Component({
   selector: 'app-chat',
@@ -11,47 +14,50 @@ import { User } from 'src/app/models';
 
 export class ChatComponent implements OnInit{
 
-  onlineUsers: string[] = [];
-  usersArray : User[];
-  usersNames : string[] = [];
   chatActiveWith : string;
-  displayChat: boolean = false;
-  displayOnline : boolean = false;
+  chatActiveWithId : number;
+  displayChat: boolean = true;
+  displayOnline : boolean = true;
+  matches: User[];
+  messageCurrent: string = "";
+
 
   constructor(private authenticationService: AuthenticationService,
-              private userService: UserService,
-              private router: Router) {
-    this.fetchContacts();
+              private router: Router,
+              private chatService: ChatService) {
+    this.matches = this.authenticationService.currentUserValue.matches;
+    this.chatActiveWith = this.matches[0].name;
+    this.chatActiveWithId = this.matches[0].id;
+    console.log(this.matches);
+    this.chatService.connect();
   }
 
   ngOnInit(): void {
-
+    console.log(this.matches)
   }
 
 
-  openChatWith(user: string) {
-    if(!this.usersNames.includes(user)){
-      console.log("User: " + user + "is not online, can't chat with him anymore :(");
-    }
-    this.chatActiveWith = user;
+  openChatWith(user: User) {
+    this.chatActiveWith = user.name;
+    this.chatActiveWithId = user.id;
     this.displayChat = true;
-  }
-
-
-  fetchContacts() {
-    this.userService.getContacts()
-      .subscribe( value  => {
-        this.usersArray = value;
-        this.usersArray.map( user => {
-          if(!this.usersNames.includes(user.name))
-              this.usersNames.push(user.name); });
-        this.displayOnline=true;
-      }, error => {
-        this.displayOnline=true;
-      });
   }
 
   toHome() {
     this.router.navigateByUrl('/');
+  }
+
+  onSend() {
+    this.messageCurrent = (document.getElementById("idMessageInput") as HTMLInputElement).value;
+    if(this.messageCurrent == null || this.messageCurrent == '')
+      return;
+
+    var msg: Message;
+    msg.id  = this.chatActiveWithId;
+    msg.msg = this.messageCurrent;
+    (document.getElementById("idMessageInput") as HTMLInputElement).value = "";
+
+    this.chatService.send(this.messageCurrent);
+    (document.getElementById("messagesList")as HTMLUListElement).innerHTML += "<li>" + msg.msg + "</li>";
   }
 }

@@ -1,30 +1,31 @@
 <mat-drawer-container *ngIf="displayOnline" class = "chatMenu">
-    <mat-drawer mode="side" opened>
+    <mat-drawer class="sideNav" mode="side" opened>
         <br>
-        <button (click)="toHome()" > Home </button><br>
-        <!-- <button (click)="fetchContacts()" class="btnOnline" ><a style="color: #00af2e">  •</a> Who is online? </button><br> -->
-    <div *ngIf="displayOnline; else noOnline" >
-      <div *ngFor="let user of usersNames ">
-        <button (click)="openChatWith(user)" class="btnOnline" ><a style="color: #00af2e">  •</a> {{user}}</button><br>
+        <button mat-icon-button class="btnBack" (click)="toHome()"><mat-icon>arrow_left_alt</mat-icon><mat-icon>home</mat-icon></button><br>
+    <div *ngIf="displayOnline; else noOnline" class="listMatches">
+      <div *ngFor="let user of matches ">
+        <button mat-flat-button (click)="openChatWith(user)" class="btnOnline" ><a style="color: #00af2e">•</a> {{user.name}} </button>
       </div>
     </div>
       <ng-template #noOnline>
-        no online users....
+        <p> No online users.... </p>
       </ng-template>
     </mat-drawer>
 
-    <mat-drawer-content class = "msgBox">
-      <!--TODO: div ispod staviti u ngTamplate  -->
+    <mat-drawer-content class="msgBox">
         <div *ngIf = displayChat>
-            <div >
+            <div>
                 <h3>{{chatActiveWith}}</h3>
-                      poruke........
+            </div>
+            <div>
+              <ul id="messagesList">
+              </ul>
             </div>
             <div class="msgForm">
-                <form >
-                    <input type="text" rows="2" style="width: 70%">
-                    <input type="submit" value="Send" >
-                </form>
+                <input id="idMessageInput"  name="messageInput" type="text" class="inputText">
+                <button mat-icon-button (click)="onSend()" style="transform: rotate(180deg); margin-left: 5%;">
+                  <mat-icon>send</mat-icon>
+                </button>
             </div>
         </div>
     </mat-drawer-content>
