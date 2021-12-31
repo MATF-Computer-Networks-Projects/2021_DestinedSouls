@@ -20,7 +20,7 @@ public class SocketProcessor {
 
     private MessageReaderFactory messageReaderFactory = null;
 
-    private Queue<Message> outboundMessageQueue = new LinkedList<>();
+    private final Queue<Message> outboundMessageQueue = new LinkedList<>();
 
     private final Map<Long, Socket> socketMap         = new HashMap<>();
     // private final Map<Long, WsImpl> webSocketMap      = new HashMap<>();
@@ -35,8 +35,8 @@ public class SocketProcessor {
 
     private long              nextSocketId = 16 * 1024; //start incoming socket ids from 16K - reserve bottom ids for pre-defined sockets (servers).
 
-    private Set<Socket> emptyToNonEmptySockets = new HashSet<>();
-    private Set<Socket> nonEmptyToEmptySockets = new HashSet<>();
+    private final Set<Socket> emptyToNonEmptySockets = new HashSet<>();
+    private final Set<Socket> nonEmptyToEmptySockets = new HashSet<>();
 
     private long       cacheTimeout;
     private final long cacheTtl = 5000;
@@ -68,10 +68,6 @@ public class SocketProcessor {
                 }
 
                 executeCycle();
-                /*
-                for(WsImpl ws : webSocketMap.values())
-                    ;
-                 */
 
             } catch(IOException e){
                 e.printStackTrace();

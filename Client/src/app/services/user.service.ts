@@ -3,7 +3,7 @@ import {HttpClient, HttpEvent} from '@angular/common/http';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { User } from 'src/app/models/user'
+import { LoggedUser, User } from 'src/app/models'
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +13,8 @@ export class UserService {
   constructor(private http: HttpClient) {    
   }  
 
-  register(user: User): Observable<User> {
-    return this.http.post<User>('/users/register', user);
+  register(user: User): Observable<LoggedUser> {
+    return this.http.post<LoggedUser>('/users/register', user);
   }
 
   getAll(): Observable<User[]> {

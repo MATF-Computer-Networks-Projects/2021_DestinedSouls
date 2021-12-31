@@ -13,6 +13,7 @@ import org.hunters.server.utils.Response;
 import org.hunters.server.utils.Responses;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class MessageProcessorImpl implements MessageProcessor {
 
@@ -73,6 +74,17 @@ public class MessageProcessorImpl implements MessageProcessor {
                 return StorageService.cache.get(response.json.get("filename")).duplicate();
             else if(response.json.hasKey("jsonArray"))
                 return Responses.createResponseBuffer( FileInfo.json(response.json.get("jsonArray").getBytes()) );
+            else if(response.json.hasKey("matches")) {
+                byte[] matches = (",\"matches\":" + response.json.remove("matches") + "}").getBytes();
+                String resStr = response.json.toString();
+                int len = resStr.length()-1;
+                byte[] resJson = resStr.substring(0,len).getBytes();
+                ByteBuffer bf = ByteBuffer.allocate(resJson.length + matches.length);
+                bf.put(resJson);
+                bf.put(matches);
+                bf.flip();
+                return Responses.createResponseBuffer( FileInfo.json(bf) );
+            }
             return Responses.createResponseBuffer( FileInfo.json(response.json.toString().getBytes()) );
         }
 

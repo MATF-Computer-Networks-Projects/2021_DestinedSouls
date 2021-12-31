@@ -1,9 +1,7 @@
 import {Gender, Interest} from "./gender";
 
 export interface User {
-  id: number;
-  email?: string;
-  token: string;
+  id: number;  
   name?: string;
   birthday?: string;
   gender?: Gender;
