@@ -17,19 +17,16 @@ export class HomepageComponent implements OnInit {
   }
 
   onLogout() {
-    this.authenticationService.logout();
-    this.router.navigateByUrl('/login');
+    this.authenticationService.logout()
+      .subscribe(next=>{
+          localStorage.removeItem('currentUser');
+          this.authenticationService.currentUserSubject.next(null);
+          this.router.navigateByUrl('/login');
+    });
+
   }
 
-  onGetAll() {
-    this.userService.getAll().subscribe(
-      data => {
-        console.log(`Data: ${data}`);
-      },
-      error => {
-        console.error(error);
-      });
-
-
+  onChat() {
+    this.router.navigateByUrl('/chat');
   }
 }

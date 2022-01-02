@@ -1,0 +1,32 @@
+<mat-drawer-container *ngIf="displayOnline" class = "chatMenu">
+    <mat-drawer mode="side" opened>
+        <br>
+        <button (click)="toHome()" > Home </button><br>
+        <button (click)="addOnline()" class="btnOnline" ><a style="color: #00af2e">  •</a> Who is online? </button><br>
+    <div *ngIf="displayOnline; else noOnline" >
+      <div *ngFor="let user of usersNames ">
+        <button (click)="openChatWith(user)" class="btnOnline" ><a style="color: #00af2e">  •</a> {{user}}</button><br>
+      </div>
+    </div>
+      <ng-template #noOnline>
+        no online users....
+      </ng-template>
+    </mat-drawer>
+
+    <mat-drawer-content class = "msgBox">
+      <!--TODO: div ispod staviti u ngTamplate  -->
+        <div *ngIf = displayChat>
+            <div >
+                <h3>{{chatActiveWith}}</h3>
+                      poruke........
+            </div>
+            <div class="msgForm">
+                <form >
+                    <input type="text" rows="2" style="width: 70%">
+                    <input type="submit" value="Send" >
+                </form>
+            </div>
+        </div>
+    </mat-drawer-content>
+</mat-drawer-container>
+
