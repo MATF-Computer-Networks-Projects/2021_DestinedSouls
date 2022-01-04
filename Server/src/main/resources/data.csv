@@ -1,8 +1,8 @@
-name,bithday,gender,interest,email,password
-Aleksa,1998-06-22,1,2,veselic@gmail.com,000000
-"Djordje",1998-08-07,1,2,"tanaskovic@gmail.com",000000
-Petar,"1998-05-05",1,1,petar@gmail.com,123123
-Ema,2000-04-04,2,3,ema@@gmail.com,"123456"
-Nikolina,2000-03-03,2,2,nikolina@gmail.com,password
-Isidora,2000-02-02,2,2,isidora@gmail.com,belizeka
-Sandra,2000-01-01,2,3,sandra@gmail.com,mojasifra
+name,bithday,gender,interest,email,password,imagepath
+Aleksa,1998-06-22,1,2,veselic@gmail.com,000000,"Aleksa.png"
+"Djordje",1998-08-07,1,2,"tanaskovic@gmail.com",000000,"Djorje.png"
+Petar,"1998-05-05",1,1,petar@gmail.com,123123,"Petar.png"
+Ema,2000-04-04,2,3,ema@@gmail.com,"123456","Ema.png"
+Nikolina,2000-03-03,2,2,nikolina@gmail.com,password,"Nikolina.png"
+Isidora,2000-02-02,2,2,isidora@gmail.com,belizeka,"Isidora.png"
+Sandra,2000-01-01,2,3,sandra@gmail.com,mojasifra,"Sandra.png"

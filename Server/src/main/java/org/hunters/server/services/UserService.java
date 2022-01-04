@@ -17,6 +17,7 @@ import java.util.function.Predicate;
 
 public class UserService {
     private static UserTable inMemUserTable = new UserTable();
+    private static UserTable inMemUserTableOnline = new UserTable();
     private static Csv data = new Csv("server/src/main/resources/data.csv");
 
     public static void load() {

@@ -16,7 +16,7 @@ export class UserService {
   }
 
   getOnline(): Observable<User[]> {
-    return this.http.get<User[]>('/users/getOnline');
+    return this.http.get<User[]>('/users/getAll');
   }
   upload(file: File, token: string): Observable<any> {
     const formData = new FormData();
@@ -27,5 +27,8 @@ export class UserService {
       reportProgress: true,
       observe: 'events'
     });
+  }
+  download(name : string) : Observable<any>{
+    return this.http.get('')
   }
 }

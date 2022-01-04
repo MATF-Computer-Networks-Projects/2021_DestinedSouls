@@ -1,0 +1,29 @@
+<div class="app-form" >
+  <div style="position: absolute">
+    <button mat-button  (click)="onHome()">Home</button>
+    <br>
+    <p>No more candidates...</p>
+  </div>
+  <div *ngIf="displayCandidates; else no" >
+    <div *ngFor="let name of usersShown">
+      <mat-card class="example-card" *ngIf="name.show" style="position: absolute">
+        <mat-card-header>
+          <mat-card-title>{{name.name}}</mat-card-title>
+        </mat-card-header>
+        <img mat-card-image [src]=name.path alt="Profile pic">
+            <mat-card-content>
+            </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button style="color: deepskyblue; background-color: whitesmoke" (click)="onVote(name.name,false)">Icy cold🧊</button>
+          <button mat-raised-button style="color: red ;background-color: coral" (click)="onVote(name.name,true)">Flaming HOT🚒</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+
+  <ng-template #no>
+    no users to swipe....
+  </ng-template>
+
+
+</div>

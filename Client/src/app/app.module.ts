@@ -10,7 +10,6 @@ import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatDividerModule } from '@angular/material/divider';
-
 import { AppComponent } from './app.component';
 //import { FormComponent } from './components/form/form.component';
 //import { IlustrationComponent } from './components/ilustration/ilustration.component';
@@ -21,6 +20,7 @@ import { HomepageComponent } from './components/homepage/homepage.component';
 import { RegisterComponent } from './components/register/register.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ChatComponent } from './components/chat/chat.component';
+import { SwipeComponent } from './components/swipe/swipe.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +30,8 @@ import { ChatComponent } from './components/chat/chat.component';
     LoginComponent,
     HomepageComponent,
     RegisterComponent,
-    ChatComponent
+    ChatComponent,
+    SwipeComponent
   ],
   imports: [
     BrowserModule,

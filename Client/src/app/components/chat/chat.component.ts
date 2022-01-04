@@ -11,7 +11,6 @@ import { User } from 'src/app/models';
 
 export class ChatComponent implements OnInit{
 
-  onlineUsers: string[] = [];
   usersArray : User[];
   usersNames : string[] = [];
   chatActiveWith : string;

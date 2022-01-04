@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router'
 import {AuthenticationService, UserService} from 'src/app/services'
+import {User} from "../../models";
 
 @Component({
   selector: 'app-homepage',
@@ -8,12 +9,17 @@ import {AuthenticationService, UserService} from 'src/app/services'
   styleUrls: ['./homepage.component.css']
 })
 export class HomepageComponent implements OnInit {
+  public user: User;
+  public path: string;
 
   constructor(private authenticationService: AuthenticationService,
               private userService: UserService,
               private router: Router) { }
 
   ngOnInit(): void {
+    this.user = this.authenticationService.currentUserValue;
+    //this.path = `${'/assets/img/'+this.user.name + '.png'}`;
+    this.path = `${this.user.name + '.png'}`;
   }
 
   onLogout() {
@@ -28,5 +34,9 @@ export class HomepageComponent implements OnInit {
 
   onChat() {
     this.router.navigateByUrl('/chat');
+  }
+
+  onSwipe() {
+    this.router.navigateByUrl('/swipe');
   }
 }

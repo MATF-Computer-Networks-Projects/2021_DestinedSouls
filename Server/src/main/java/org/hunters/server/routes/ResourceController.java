@@ -34,7 +34,6 @@ public class ResourceController implements IController {
     }
 
     static Response get(String url) {
-
         String filename = FileInfo.getFilename(url);
         if (!StorageService.cache.contains(filename)) {
             var path = Paths.get(FileInfo.PUBLIC_HTML_DIR, url);
