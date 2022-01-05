@@ -1,45 +1,79 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs'
-import {catchError, map} from 'rxjs/operators'
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {BehaviorSubject, Observable, Subject, Subscription} from 'rxjs'
+import {catchError, map, tap} from 'rxjs/operators'
 import {Router} from "@angular/router";
 import {AuthenticationService, ChatService, UserService} from "src/app/services";
 
-import { User, Message } from "src/app/models";
+import {User, ChatMessage, Message, MatchUser} from "src/app/models";
+import {WebsocketService} from "../../services/websocket.service";
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
-  styleUrls: ['./chat.component.css']
+  styleUrls: ['./chat.component.css'],
+  providers: [WebsocketService, ChatService]
 })
 
-export class ChatComponent implements OnInit{
+export class ChatComponent implements OnInit, OnDestroy{
 
-  chatActiveWith : string;
-  chatActiveWithId : number;
+  chatActiveWith : BehaviorSubject<MatchUser>;
+
+  // chatActiveWith : MatchUser;
   displayChat: boolean = true;
   displayOnline : boolean = true;
-  matches: User[];
-  messageCurrent: string = "";
+
+  messagePending: ChatMessage[] = [];
+
+  matches: MatchUser[];
+  messages$: Subject<Message>;
+
 
 
   constructor(private authenticationService: AuthenticationService,
               private router: Router,
               private chatService: ChatService) {
+
+    // TODO: if no matches offer to switch to matching
+
     this.matches = this.authenticationService.currentUserValue.matches;
-    this.chatActiveWith = this.matches[0].name;
-    this.chatActiveWithId = this.matches[0].id;
-    console.log(this.matches);
-    this.chatService.connect();
+    this.chatActiveWith = new BehaviorSubject<MatchUser>(this.matches[0]);
+    this.displayChat = this.chatActiveWith ? true : false;
+
+
+    this.messages$ = chatService.messages;
+    this.messages$.subscribe(
+      (msg: Message) => {
+            if(!msg.msg) {
+              if(this.messagePending.length > 0) {
+                this.chatActiveWith.value.messages.push(this.messagePending[0]);
+                this.messagePending = this.messagePending.slice(1, -1);
+              }
+              return;
+            }
+            console.log(`Response from ${msg.id}: ${msg.msg}`);
+            if(msg.id){
+              this.matches.find(m => m.id === msg.id)
+                      .messages.push({received: msg.token ? false : true, msg: msg.msg});
+            }
+          },
+      error => {
+
+      },
+      () => { console.log("Closing...") }
+      );
+
+
   }
 
   ngOnInit(): void {
     console.log(this.matches)
   }
 
+  ngOnDestroy() {
+  }
 
-  openChatWith(user: User) {
-    this.chatActiveWith = user.name;
-    this.chatActiveWithId = user.id;
+  openChatWith(user: MatchUser) {
+    this.chatActiveWith.next(user);
     this.displayChat = true;
   }
 
@@ -48,16 +82,23 @@ export class ChatComponent implements OnInit{
   }
 
   onSend() {
-    this.messageCurrent = (document.getElementById("idMessageInput") as HTMLInputElement).value;
-    if(this.messageCurrent == null || this.messageCurrent == '')
+    const messageCurrent = (document.getElementById("idMessageInput") as HTMLInputElement).value;
+    if(messageCurrent == null || messageCurrent == '')
       return;
 
-    var msg: Message;
-    msg.id  = this.chatActiveWithId;
-    msg.msg = this.messageCurrent;
     (document.getElementById("idMessageInput") as HTMLInputElement).value = "";
 
-    this.chatService.send(this.messageCurrent);
-    (document.getElementById("messagesList")as HTMLUListElement).innerHTML += "<li>" + msg.msg + "</li>";
+    console.log(`new message from client to ${this.chatActiveWith.value.id}: ${messageCurrent}`);
+
+    this.messages$.next({
+      token: this.authenticationService.currentUserValue.token,
+      id:    this.chatActiveWith.value.id,
+      msg:   messageCurrent
+    });
+
+    // this.messagePending.push({received: false, msg: messageCurrent});
+    this.chatActiveWith.value.messages.push({received: false, msg: messageCurrent});
   }
+
+
 }

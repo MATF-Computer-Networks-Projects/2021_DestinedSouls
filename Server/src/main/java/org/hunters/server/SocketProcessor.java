@@ -23,7 +23,6 @@ public class SocketProcessor {
     private final Queue<Message> outboundMessageQueue = new LinkedList<>();
 
     private final Map<Long, Socket> socketMap         = new HashMap<>();
-    // private final Map<Long, WsImpl> webSocketMap      = new HashMap<>();
 
     private final ByteBuffer readByteBuffer  = ByteBuffer.allocate(1024 * 1024);
     private final ByteBuffer writeByteBuffer = ByteBuffer.allocate(1024 * 1024);
@@ -39,7 +38,7 @@ public class SocketProcessor {
     private final Set<Socket> nonEmptyToEmptySockets = new HashSet<>();
 
     private long       cacheTimeout;
-    private final long cacheTtl = 5000;
+    private final long cacheTtl = 30000;
 
     public SocketProcessor(Queue<Socket> inboundSocketQueue, MessageBuffer readMessageBuffer, MessageBuffer writeMessageBuffer, MessageReaderFactory messageReaderFactory, MessageProcessor messageProcessor) throws IOException {
         this.inboundSocketQueue   = inboundSocketQueue;
@@ -61,15 +60,9 @@ public class SocketProcessor {
     public void run() {
         //noinspection InfiniteLoopStatement
         while(true){
-            try{
-                if(System.currentTimeMillis() - this.cacheTimeout > cacheTtl) {
-                    StorageService.resetLocalCache();
-                    this.cacheTimeout = System.currentTimeMillis();
-                }
-
+            try {
                 executeCycle();
-
-            } catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -132,13 +125,7 @@ public class SocketProcessor {
         if(fullMessages.size() > 0){
             for(Message message : fullMessages){
                 message.socketId = socket.socketId; // TODO: add protocol too
-                this.messageProcessor.process(message, this.writeProxy);  //the message processor will eventually push outgoing messages into an IMessageWriter for this socket.
-                /*
-                if(socket.protocol == Protocol.WS && !this.webSocketMap.containsKey(socket.socketId)) {
-                    socket.messageReader = new WsMessageReader(socket.messageReader);
-                    this.socketMap.remove(socket.socketId);
-                    this.webSocketMap.put(socket.socketId, new WsImpl(socket));
-                }*/
+                this.messageProcessor.process(message, this.writeProxy);
             }
             fullMessages.clear();
         }

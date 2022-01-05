@@ -1,5 +1,6 @@
 package org.hunters.server.utils;
 
+import org.hunters.server.protocols.ws.framing.CloseFrame;
 import org.hunters.server.security.Authorizer;
 
 import java.io.IOException;
@@ -39,6 +40,7 @@ public final class Responses {
             }
         }
         // Create a special buffers
+        // http
         this.responseBuffers.put("", this.responseBuffers.get("index.html"));
         this.responseBuffers.put("/", this.responseBuffers.get("index.html"));
         this.responseBuffers.put("204", this.createNoContent());
@@ -48,6 +50,10 @@ public final class Responses {
         this.responseBuffers.put("405", this.createNotAllowed());
         this.responseBuffers.put("500", this.createInternalServerError());
         this.responseBuffers.put("501", this.createNotImplementedBuffer());
+
+        // ws
+        this.responseBuffers.put("1003", wsCloseFrameResponse(1003, "Invalid message"));
+        this.responseBuffers.put("1008", wsCloseFrameResponse(1008, "Invalid authorization token"));
     }
 
 
@@ -186,13 +192,60 @@ public final class Responses {
         return this.responseBuffers.get(key);
     }
 
-    // TODO: Add int keys
-
     public boolean contains(String buffer) {
         return this.responseBuffers.containsKey(buffer);
     }
 
     public void put(String key, ByteBuffer buffer) {
         this.responseBuffers.put(key, buffer);
+    }
+
+    public static ByteBuffer wsEmptyJson(byte firstByte) {
+        ByteBuffer bf = ByteBuffer.allocate(4);
+        bf.put(firstByte);
+        bf.put((byte) 2);
+        bf.put("{}".getBytes(StandardCharsets.UTF_8));
+        bf.flip();
+        return bf;
+    }
+
+    public static ByteBuffer wsCloseFrameResponse(int code, String reason) {
+        var closeFrame = new CloseFrame();
+        closeFrame.setCode(code);
+        closeFrame.setReason(reason);
+
+        ByteBuffer bf = ByteBuffer.allocate(4 + reason.length());
+        bf.put(closeFrame.encoded());
+        bf.put((byte) (reason.length() + 2));
+        bf.put((byte) (code >> 8));
+        bf.put((byte) code);
+        bf.put(reason.getBytes(StandardCharsets.UTF_8));
+        bf.flip();
+
+        return bf;
+    }
+
+    public static ByteBuffer wsResponse(byte firstByte, String payload) {
+        int lenBytes = (payload.length() < 126 ? 1 : (payload.length() < 4096 ? 3 : 9));
+        ByteBuffer bf = ByteBuffer.allocate(1 + lenBytes + payload.length());
+        bf.put(firstByte);
+
+        if(lenBytes == 1)
+            bf.put((byte) payload.length());
+        else if(lenBytes == 3) {
+            bf.put((byte) 126);
+            bf.put((byte) (payload.length() >> 8));
+            bf.put((byte) payload.length());
+        }
+        else {
+            bf.put((byte) 127);
+            for(int i = 7; i >= 0; --i)
+                bf.put((byte)(payload.length() >> i*8));
+        }
+
+        bf.put(payload.getBytes(StandardCharsets.UTF_8));
+        bf.flip();
+
+        return bf;
     }
 }

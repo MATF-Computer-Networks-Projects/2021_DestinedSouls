@@ -22,10 +22,16 @@ public class Router {
         return routes.containsKey(route);
     }
 
+    private String urlResolve(String url) {
+        int idx = url.indexOf('/',1);
+        return idx == -1 ? url : url.substring(0, idx);
+    }
+
     public Response forward(HttpRequest request) {
-        int idx = request.headers.url.indexOf('/',1);
-        String route = idx == -1 ? request.headers.url : request.headers.url.substring(0, idx);
-        request.headers.url = idx == -1 ? request.headers.url : request.headers.url.substring(route.length());
+
+        String route = urlResolve(request.headers.url);
+        request.headers.url = route.length() == request.headers.url.length() ? request.headers.url
+                                                                    : request.headers.url.substring(route.length());
 
         if(!routes.containsKey(route)) {
             if(route.indexOf('.') != -1)
@@ -33,6 +39,15 @@ public class Router {
             else
                 return new Response(404);
         }
+
+        return routes.get(route).handle(request);
+    }
+
+    public Response forward(String url, String request) {
+        String route = urlResolve(url);
+
+        if(!routes.containsKey(route))
+            return new Response(404);
 
         return routes.get(route).handle(request);
     }

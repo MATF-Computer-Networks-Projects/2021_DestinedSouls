@@ -33,10 +33,9 @@ public class Server {
         this.socketProcessor = new SocketProcessor(socketQueue, readBuffer, writeBuffer,  this.messageReaderFactory, this.messageProcessor);
 
         Thread accepterThread  = new Thread(this.socketAcceptor);
-        //Thread processorThread = new Thread(this.socketProcessor);
 
         accepterThread.start();
-        //processorThread.start();
+
         this.socketProcessor.run();
     }
 

@@ -21,7 +21,7 @@ public class MatchesTable {
         }
 
         public int getMatch(int id) {
-            return user1 == id ? user2 : user1;
+            return user1 == id ? user2 : (user2 == id ? user1 : -2);
         }
     }
 
@@ -35,7 +35,14 @@ public class MatchesTable {
         return id;
     }
 
-    public int getMatch(int matchId, int userId) {
-        return table.get(matchId).getMatch(userId);
+    /**
+     * Get match's id from provided chatId and id of user sending a message.
+     *
+     * @return user id of match, or -1 if chat does not exist, or -2 if requesting user is not part of specified chat
+     */
+    public int getMatch(int chatId, int userId) {
+        if(!table.containsKey(chatId))
+            return -1;
+        return table.get(chatId).getMatch(userId);
     }
 }

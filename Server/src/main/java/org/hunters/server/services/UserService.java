@@ -1,5 +1,6 @@
 package org.hunters.server.services;
 
+import org.hunters.server.models.ChatMessage;
 import org.hunters.server.models.users.MatchesTable;
 import org.hunters.server.models.users.User;
 import org.hunters.server.models.users.UserTable;
@@ -17,6 +18,8 @@ public class UserService {
     private final static UserTable inMemUserTable = new UserTable();
     private final static MatchesTable matchesTable = new MatchesTable();
     private final static Csv data = new Csv("server/src/main/resources/data.csv");
+
+    public final static HashSet<Long> socketsToClose = new HashSet<>();
 
     public static void load() {
         try {
@@ -71,7 +74,7 @@ public class UserService {
 
     private static String formattedMatch(int matchId, int userId) {
         var user = inMemUserTable.getById(userId);
-        return "{\"matchId\":\"" + matchId + "\"," + summary(user) + '}';
+        return "{\"id\":\"" + matchId + "\"," + summary(user) + '}';
     }
 
     /*
@@ -166,5 +169,24 @@ public class UserService {
 
         String strPath = StorageService.uploadsDir.toString() + "/" + imagePath.getFileName();
         return new Response(200, "{\"img\":\"" + strPath + "\"}");
+    }
+
+    public static int getMatchUser(int chatId, int userId) {
+        return matchesTable.getMatch(chatId, userId);
+    }
+
+    public static long getSocketId(int userId) {
+        return inMemUserTable.getById(userId).socketId;
+    }
+
+    public static void setSocketId(int userId, long socketId) {
+        var user = inMemUserTable.getById(userId);
+        if(user.socketId != -1)
+            socketsToClose.add(user.socketId);
+        user.socketId = socketId;
+    }
+
+    public static void appendMessage(int userId, int chatId, String msg) {
+        getById(userId).pendingMessages.add(new ChatMessage(chatId, msg));
     }
 }

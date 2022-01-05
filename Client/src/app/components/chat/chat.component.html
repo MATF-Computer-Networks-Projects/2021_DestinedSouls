@@ -3,7 +3,7 @@
         <br>
         <button mat-icon-button class="btnBack" (click)="toHome()"><mat-icon>arrow_left_alt</mat-icon><mat-icon>home</mat-icon></button><br>
     <div *ngIf="displayOnline; else noOnline" class="listMatches">
-      <div *ngFor="let user of matches ">
+      <div *ngFor="let user of matches">
         <button mat-flat-button (click)="openChatWith(user)" class="btnOnline" ><a style="color: #00af2e">•</a> {{user.name}} </button>
       </div>
     </div>
@@ -13,16 +13,19 @@
     </mat-drawer>
 
     <mat-drawer-content class="msgBox">
-        <div *ngIf = displayChat>
+        <div *ngIf ="displayChat && chatActiveWith.value.messages">
             <div>
-                <h3>{{chatActiveWith}}</h3>
+                <h3>{{chatActiveWith.value.name}}</h3>
             </div>
-            <div>
-              <ul id="messagesList">
-              </ul>
+
+            <div id="messagesList" *ngFor="let m of chatActiveWith.value.messages">
+              <div [ngClass]="['msg', (m.received ? 'leftMsg' : 'rightMsg')]">
+                <span [ngClass]="['msgContent', (m.received ? 'leftMsg' : 'rightMsg')]">{{m.msg}}</span>
+              </div>
             </div>
+
             <div class="msgForm">
-                <input id="idMessageInput"  name="messageInput" type="text" class="inputText">
+                <input id="idMessageInput" name="messageInput" type="text" class="inputText" (keydown.enter)="onSend()" autocomplete="off">
                 <button mat-icon-button (click)="onSend()" style="transform: rotate(180deg); margin-left: 5%;">
                   <mat-icon>send</mat-icon>
                 </button>

@@ -37,6 +37,7 @@ public class HttpHeaders extends MessageMetaData {
     public static class HttpWsHeaders {
         public String key = null;
         public String protocol = null;
+        public long    socketId = -1;
 
         public boolean isValid() {
             return key != null;

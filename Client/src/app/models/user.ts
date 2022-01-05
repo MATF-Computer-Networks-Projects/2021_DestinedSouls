@@ -1,9 +1,19 @@
-import {Gender, Interest} from "./gender";
+import {Gender, Interest, ChatMessage} from "./";
 
 export interface User {
-  id: number;  
+  id: number;
   name?: string;
   birthday?: string;
   gender?: Gender;
   interest?: Interest;
+}
+
+export interface MatchUser extends User {
+  messages?: ChatMessage[];
+}
+
+export interface LoggedUser extends User {
+  email?: string;
+  token: string;
+  matches?: MatchUser[];
 }

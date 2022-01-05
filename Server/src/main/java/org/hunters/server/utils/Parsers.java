@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parsers {
-    public static final String jsonRegex = "\"([a-zA-Z0-9]+)\":\"([a-zA-Z0-9\\-.@<>:,=!#$%^&*()_+/]+)\"";
+    public static final String jsonRegex = "\"([a-zA-Z0-9]+)\":\"([a-zA-Z0-9\\-.@<>:,=!#$%^&*()_+/ ]+)\"";
     public static final Pattern jsonPattern = Pattern.compile(jsonRegex);
 
     public static final String csvRegex = "(?:,|\\n|^)(\"(?:(?:\"\")*[^\"]*)*\"|[^\",\\n]*|(?:\\n|$))";

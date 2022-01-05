@@ -26,7 +26,7 @@ public abstract class Frame {
     }
 
     public byte encoded() {
-        int mask = this.FIN ? 128 : 0;
+        int mask = this.FIN ? 1 << 7 : 0;
         mask |= this.RSV1 ? 64 : 0;
         mask |= this.RSV2 ? 32 : 0;
         mask |= this.RSV3 ? 16 : 0;
