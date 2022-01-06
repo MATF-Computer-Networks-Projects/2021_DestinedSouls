@@ -226,24 +226,25 @@ public final class Responses {
     }
 
     public static ByteBuffer wsResponse(byte firstByte, String payload) {
-        int lenBytes = (payload.length() < 126 ? 1 : (payload.length() < 4096 ? 3 : 9));
-        ByteBuffer bf = ByteBuffer.allocate(1 + lenBytes + payload.length());
+        byte[] payloadBytes = payload.getBytes(StandardCharsets.UTF_8);
+        int lenBytes = (payloadBytes.length < 126 ? 1 : (payloadBytes.length < 4096 ? 3 : 9));
+        ByteBuffer bf = ByteBuffer.allocate(1 + lenBytes + payloadBytes.length);
         bf.put(firstByte);
 
         if(lenBytes == 1)
-            bf.put((byte) payload.length());
+            bf.put((byte) payloadBytes.length);
         else if(lenBytes == 3) {
             bf.put((byte) 126);
-            bf.put((byte) (payload.length() >> 8));
-            bf.put((byte) payload.length());
+            bf.put((byte) (payloadBytes.length >> 8));
+            bf.put((byte) payloadBytes.length);
         }
         else {
             bf.put((byte) 127);
             for(int i = 7; i >= 0; --i)
-                bf.put((byte)(payload.length() >> i*8));
+                bf.put((byte)(payloadBytes.length >> i*8));
         }
 
-        bf.put(payload.getBytes(StandardCharsets.UTF_8));
+        bf.put(payloadBytes);
         bf.flip();
 
         return bf;

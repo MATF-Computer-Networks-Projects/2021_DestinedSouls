@@ -105,7 +105,7 @@ public class UserService {
         return "\"name\":\"" + user.name + "\"," +
                 "\"email\":\"" + user.email + "\"," +
                 "\"birthday\":\"" + user.getBday() + '\"' +
-            (user.image != null ? "\"image\":\"" + user.image : "");
+            (user.image != null ? "\"image\":\"" + user.image + '\"' : "");
     }
 
     /*
@@ -165,7 +165,7 @@ public class UserService {
         var user = getById(id);
         if(user == null)
             return new Response(404);
-        user.setImage(imagePath);
+        user.setImage(imagePath.toString().replace('\\','/'));
 
         String strPath = StorageService.uploadsDir.toString() + "/" + imagePath.getFileName();
         return new Response(200, "{\"img\":\"" + strPath + "\"}");

@@ -16,7 +16,7 @@ public class User {
     public Gender interest;
     public String email;
     public byte[] hash;
-    public Path image = null;
+    public String image = null;
 
     private final HashSet<Integer> blacklist = new HashSet<>();
     private final HashSet<Integer> matches   = new HashSet<>();
@@ -100,7 +100,7 @@ public class User {
                 '}';
     }
 
-    public void setImage(Path path) {
+    public void setImage(String path) {
         this.image = path;
     }
 

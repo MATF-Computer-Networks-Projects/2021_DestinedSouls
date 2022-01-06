@@ -9,4 +9,8 @@ public class ChatMessage {
         this.chatId = chatId;
         this.msg    = msg;
     }
+
+    public String asJsonString() {
+        return "{\"id\":\"" + chatId + "\",\"msg\":\"" + msg + "\"}";
+    }
 }
