@@ -1,29 +1,21 @@
 <div class="app-form" >
-  <div style="position: absolute">
-    <button mat-button  (click)="onHome()">Home</button>
+  <div style="position: relative">
+    <button mat-icon-button class="btnBack" (click)="onHome()"><mat-icon>arrow_left_alt</mat-icon><mat-icon>home</mat-icon></button><br>
     <br>
-    <p>No more candidates...</p>
+    <p *ngIf="usersShown.length === 0">No more candidates...</p>
   </div>
-  <div *ngIf="displayCandidates; else no" >
-    <div *ngFor="let user of usersShown">
-      <mat-card class="example-card" style="position: absolute">
+  <div *ngIf="displayCandidates && usersShown.length > 0;" >
+      <mat-card class="example-card">
         <mat-card-header>
-          <mat-card-title>{{user.name}}</mat-card-title>
+          <mat-card-title>{{usersShown[0].name}}</mat-card-title>
         </mat-card-header>
-        <img mat-card-image style="width: min-content" [src]="'/upload/profile/' + user.image" alt="Profile pic">
+        <img mat-card-image [src]="'/upload/profile/' + usersShown[0].image" alt="Profile pic">
             <mat-card-content>
             </mat-card-content>
-        <mat-card-actions>
-          <button mat-raised-button style="color: deepskyblue; background-color: whitesmoke" (click)="onVote(user,false)">Icy cold🧊</button>
-          <button mat-raised-button style="color: red ;background-color: coral" (click)="onVote(user,true)">Flaming HOT🚒</button>
+        <mat-card-actions style="display: flex;">
+          <button mat-raised-button style="color: deepskyblue; background-color: whitesmoke" (click)="onVote(usersShown[0],false)">Icy cold🧊</button>
+          <button mat-raised-button style="color: red ;background-color: coral" (click)="onVote(usersShown[0],true)">Flaming HOT🚒</button>
         </mat-card-actions>
       </mat-card>
-    </div>
   </div>
-
-  <ng-template #no>
-    no users to swipe....
-  </ng-template>
-
-
 </div>

@@ -39,7 +39,7 @@ export class SwipeComponent implements OnInit {
 
   onVote(user: User, vote: boolean) {
     this.candidates.push({id: user.id, like: (vote?"true":"false")});
-    this.usersShown.splice(this.usersShown.indexOf(user), 1);
+    this.usersShown.splice(0, 1);
     if(this.usersShown.length === 0)
       this.userService.sendSwipeVotes(this.candidates)
         .pipe().subscribe(data => {});
