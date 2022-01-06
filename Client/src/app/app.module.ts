@@ -22,6 +22,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ChatComponent } from './components/chat/chat.component';
 import { SwipeComponent } from './components/swipe/swipe.component';
 import {AuthInterceptor} from "./services/http-interceptors/auth-interceptor";
+import {WebsocketService} from "./services/websocket.service";
+import {ChatService} from "./services";
 
 @NgModule({
   declarations: [
@@ -51,8 +53,9 @@ import {AuthInterceptor} from "./services/http-interceptors/auth-interceptor";
   providers: [
     { provide: APP_BASE_HREF, useValue: '/'},
     { provide: LocationStrategy, useClass: HashLocationStrategy },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
-
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    WebsocketService,
+    ChatService
   ],
   bootstrap: [AppComponent]
 })
