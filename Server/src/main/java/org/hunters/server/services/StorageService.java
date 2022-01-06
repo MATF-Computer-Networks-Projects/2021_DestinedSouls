@@ -14,12 +14,8 @@ public class StorageService {
                                                     ? System.getenv("PUBLIC_UPLOADS")
                                                     : "public_uploads" );
 
-    public static void resetLocalCache() {
-        try {
-            StorageService.cache.fillLocalCache();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void resetLocalCache() throws IOException {
+        StorageService.cache.fillLocalCache();
     }
 
     public static Path store(byte[] rawFile, String path) throws IOException {

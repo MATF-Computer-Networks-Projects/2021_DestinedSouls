@@ -62,6 +62,10 @@ public final class FileInfo {
         return new FileInfo("application/json", StandardCharsets.UTF_8, ByteBuffer.wrap(data));
     }
 
+    public static FileInfo json(ByteBuffer byteBuffer) {
+        return new FileInfo("application/json", StandardCharsets.UTF_8, byteBuffer);
+    }
+
     private final String MIMEType;
     private final Charset encoding;
     private final ByteBuffer data;

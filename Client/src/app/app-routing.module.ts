@@ -25,7 +25,8 @@ const routes: Routes = [
   },
   {
     path: 'chat',
-    component: ChatComponent
+    component: ChatComponent,
+    canActivate: [AuthGuardService]
   }
 ];
 

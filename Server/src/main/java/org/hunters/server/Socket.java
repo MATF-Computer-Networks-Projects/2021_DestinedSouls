@@ -1,5 +1,7 @@
 package org.hunters.server;
 
+import org.hunters.server.protocols.Protocol;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -8,6 +10,7 @@ import java.nio.channels.SocketChannel;
 public class Socket {
 
     public long socketId;
+    public Protocol protocol = Protocol.HTTP;
 
     public SocketChannel  socketChannel = null;
     public MessageReader  messageReader = null;

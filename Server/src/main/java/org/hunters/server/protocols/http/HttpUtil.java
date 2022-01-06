@@ -243,7 +243,7 @@ public class HttpUtil {
         int endLine = HttpUtil.findNextLineBreak(request.sharedArray, filenameIndex, httpHeaders.bodyEndIndex)-2; // "CR
 
         var filename = HttpUtil.sliceAsString(request.sharedArray, filenameIndex, endLine);
-        httpRequest.other.put("filename", filename);
+        httpRequest.setValue("filename", filename);
 
         endLine += 3;
 

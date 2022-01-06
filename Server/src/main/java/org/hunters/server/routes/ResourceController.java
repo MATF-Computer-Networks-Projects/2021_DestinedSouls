@@ -65,10 +65,10 @@ public class ResourceController implements IController {
         try {
             int id = Integer.parseInt(tokenParsed.get("sub"));
 
-            if(!request.other.containsKey("filename"))
+            if(!request.hasValue("filename"))
                 return new Response(400);
 
-            String filename = request.other.get("filename");
+            String filename = request.getValue("filename");
 
 
             Path imgPath = StorageService.store((byte[])request.payload, filename);

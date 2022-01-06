@@ -1,12 +1,11 @@
 package org.hunters.server.models.users;
 
+import org.hunters.server.models.ChatMessage;
 import org.hunters.server.security.Authorizer;
 
-import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 
 public class User {
     public int id;
@@ -16,9 +15,15 @@ public class User {
     public Gender interest;
     public String email;
     public byte[] hash;
-    public Path image = null;
+    public String image = null;
 
-    private static int idObj = 1;
+    private final HashSet<Integer> blacklist = new HashSet<>();
+    private final HashSet<Integer> matches   = new HashSet<>();
+    public  long  socketId = -1;
+
+    public final LinkedList<ChatMessage> pendingMessages = new LinkedList<>();
+
+    private static int idObj = 0;
 
     public User( String name,
                  Date birthday,
@@ -32,8 +37,8 @@ public class User {
         this.birthday = birthday;
         this.email    = email;
         try {
-            this.gender   = Genders.fromString(gender);
-            this.interest = Genders.fromString(interest);
+            this.gender   = Gender.fromString(gender);
+            this.interest = Gender.fromString(interest);
             this.hash = Authorizer.encrypt(password);
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
@@ -89,11 +94,24 @@ public class User {
                 ",\"gender\":\"" + gender + "\"" +
                 ",\"interest\":\"" + interest + "\"" +
                 ",\"email\":\"" + email  + "\"" +
+                (image != null ? ",\"image\":\"" + image + "\"" : "") +
                 '}';
     }
 
-
-    public void setImage(Path path) {
+    public void setImage(String path) {
         this.image = path;
+    }
+
+    public boolean suggestUser(User user) {
+        return user.gender.acceptable(interest) && gender.acceptable(user.interest) && !blacklist.contains(user.id);
+    }
+
+    public void addNewMatch(int matchId, int userId) {
+        this.matches.add(matchId);
+        this.blacklist.add(userId); // to avoid suggesting a match
+    }
+
+    public Set<Integer> getMatches() {
+        return matches;
     }
 }

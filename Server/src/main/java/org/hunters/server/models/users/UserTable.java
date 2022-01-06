@@ -8,7 +8,7 @@ public class UserTable {
     private Map<Integer, User> inMemTable;
 
     public UserTable() {
-        this.inMemTable = new HashMap<Integer, User>();
+        this.inMemTable = new HashMap<>();
     }
 
     public void add(User user) {
@@ -29,4 +29,5 @@ public class UserTable {
     public Collection<User> getAll() {
         return inMemTable.values();
     }
+
 }

@@ -50,4 +50,8 @@ public class Json {
         s.setCharAt(s.length()-1, '}');
         return s.toString();
     }
+
+    public String remove(String key) {
+        return this.jsonObj.remove(key);
+    }
 }

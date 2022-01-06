@@ -29,7 +29,7 @@ public class WsMessageReader extends MessageReader {
         int len = (int)headers.frame.length;
         int off = this.nextMessage.offset;
 
-        if(len > 4) {
+        if(headers.frame.opcode.toInt() < 0x3 && len > 4) {
             headers.frame.payload.get(key, 0, 4);
             headers.frame.payload.get(this.nextMessage.sharedArray, off, len);
 

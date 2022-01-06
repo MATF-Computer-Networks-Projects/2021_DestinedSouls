@@ -17,13 +17,8 @@ export class HomepageComponent implements OnInit {
   }
 
   onLogout() {
-    this.authenticationService.logout()
-      .subscribe(next=>{
-          localStorage.removeItem('currentUser');
-          this.authenticationService.currentUserSubject.next(null);
-          this.router.navigateByUrl('/login');
-    });
-
+    this.authenticationService.logout();
+    this.router.navigateByUrl('/login');
   }
 
   onChat() {
