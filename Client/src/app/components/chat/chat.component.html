@@ -1,0 +1,36 @@
+<mat-drawer-container *ngIf="displayOnline" class = "chatMenu">
+    <mat-drawer class="sideNav" mode="side" opened>
+        <br>
+        <button mat-icon-button class="btnBack" (click)="toHome()"><mat-icon>arrow_left_alt</mat-icon><mat-icon>home</mat-icon></button><br>
+    <div *ngIf="displayOnline; else noOnline" class="listMatches">
+      <div *ngFor="let user of matches">
+        <button mat-flat-button (click)="openChatWith(user)" class="btnOnline" ><a style="color: #00af2e">•</a> {{user.name}} </button>
+      </div>
+    </div>
+      <ng-template #noOnline>
+        <p> No online users.... </p>
+      </ng-template>
+    </mat-drawer>
+
+    <mat-drawer-content class="msgBox">
+        <div *ngIf ="displayChat && chatActiveWith.value.messages">
+            <div>
+                <h3>{{chatActiveWith.value.name}}</h3>
+            </div>
+
+            <div id="messagesList" *ngFor="let m of chatActiveWith.value.messages">
+              <div [ngClass]="['msg', (m.received ? 'leftMsg' : 'rightMsg')]">
+                <span [ngClass]="['msgContent', (m.received ? 'leftMsg' : 'rightMsg')]">{{m.msg}}</span>
+              </div>
+            </div>
+
+            <div class="msgForm">
+                <input id="idMessageInput" name="messageInput" type="text" class="inputText" (keydown.enter)="onSend()" autocomplete="off">
+                <button mat-icon-button (click)="onSend()" style="transform: rotate(180deg); margin-left: 5%;">
+                  <mat-icon>send</mat-icon>
+                </button>
+            </div>
+        </div>
+    </mat-drawer-content>
+</mat-drawer-container>
+

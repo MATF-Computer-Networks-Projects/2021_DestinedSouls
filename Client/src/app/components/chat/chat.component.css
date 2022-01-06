@@ -1,0 +1,78 @@
+.chatMenu{
+    max-width: 70%;
+    height: 85%;
+    margin: 5% auto;
+    background-color: #ffffff;
+    padding: 20px 20px 20px 20px;
+    border-radius: 4px;
+    color: #505e6c;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+}
+
+.msgBox{
+  padding: 20px 20px 20px 20px;
+  position:relative;
+}
+.msgForm{
+  position:absolute;
+  bottom:10%;
+  width: 100%;
+
+  background-color: hsl(185, 86%, 92%);
+}
+.btnOnline{
+  text-align: left;
+  width: 90%;
+  margin: 5% 0% 5% 1%;
+}
+
+.sideNav {
+  width: 20%;
+}
+
+.btnBack {
+  position: absolute;
+  padding-left: 0%;
+}
+
+.listMatches {
+  padding-top: 20%;
+}
+
+.inputText {
+  width: 75%;
+  margin-left: 5%;
+  border: none transparent;
+  background: transparent;
+  outline: none;
+}
+
+.msg {
+  display: flex;
+  word-wrap: break-word;
+  width: auto;
+  margin-top: 1%;
+}
+
+.leftMsg {
+  margin-right: 55%;
+}
+
+.rightMsg {
+  justify-content: flex-end;
+  margin-left: 55%;
+}
+
+.msgContent {
+  padding: 5% 5% 5% 5%;
+  border-radius: 5%;
+}
+
+.msgContent.leftMsg {
+  background: #e1b8ff;
+}
+
+.msgContent.rightMsg {
+  background: #7abaff;
+}
+

@@ -1,0 +1,12 @@
+.app-form{
+  max-width: 240px;
+  height: 550px;
+  margin: 80px auto;
+  background-color: #ffffff;
+  padding: 40px;
+  padding-bottom: 40px;
+  border-radius: 4px;
+  color: #505e6c;
+  box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+  image-rendering: crisp-edges;
+}

@@ -4,6 +4,7 @@
 /dist
 /tmp
 /out-tsc
+**/target
 # Only exists if Bazel was run
 /bazel-out
 
@@ -22,6 +23,7 @@ chrome-profiler-events*.json
 .settings/
 *.sublime-workspace
 *.iml
+out
 
 # IDE - VSCode
 .vscode/*
@@ -45,7 +47,11 @@ testem.log
 .DS_Store
 Thumbs.db
 
-Client/.angular
-Client/node_modules
-Client/dist
-Client/tmp
+[Cc]lient/.angular
+[Cc]lient/node
+[Cc]lient/node_modules
+[Cc]lient/dist
+[Cc]lient/tmp
+
+**/[Pp]ublic_*
+
