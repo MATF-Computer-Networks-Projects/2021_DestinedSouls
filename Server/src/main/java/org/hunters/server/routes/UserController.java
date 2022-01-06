@@ -7,6 +7,8 @@ import org.hunters.server.services.Validator;
 import org.hunters.server.utils.Json;
 import org.hunters.server.utils.Response;
 
+import java.util.Arrays;
+
 public class UserController implements IController {
     private static final String routeRoot = "/users";
     public UserController() {
@@ -21,16 +23,13 @@ public class UserController implements IController {
         switch (request.headers.httpMethod) {
             case GET:  { return get(request); }
             case POST: { return post(request); }
-            //case HEAD:
-            //case PUT:
-            //case DELETE: { response.writeToMessage(StorageService.cache.get("501").duplicate());  break; }
             default: {    return new Response(405); }
         }
     }
 
     private Response get(HttpRequest request) {
         switch (request.headers.url) {
-            case "/getAll": {
+            case "/swipes": {
                 if(request.headers.token == null)
                     return new Response(401);
 
@@ -42,7 +41,7 @@ public class UserController implements IController {
 
                 int id = Integer.parseInt(token.get("sub"));
                 if(id <= 0) { return new Response(403); }
-                var users = UserService.getAll(id);
+                var users = UserService.getSwipes(id);
                 if(users == null) { return new Response(403); }
                 StringBuilder sb = new StringBuilder("[");
                 for(var u : users)
@@ -60,24 +59,40 @@ public class UserController implements IController {
     }
 
     private Response post(HttpRequest request) {
-        Json reqBody = (Json)request.payload;
         switch (request.headers.url) {
             case "/authenticate": {
+                Json reqBody = (Json)request.payload;
                 if(!Validator.validateSchema(reqBody, new String[]{"email", "password"}))
-                    return new Response(400, "\"msg:\":\"" + reqBody.get("error") + '\"');
+                    return new Response(400, "\"msg:\":\"" + reqBody.get("error") + "\"");
 
 
                 return UserService.authenticate(reqBody.get("email"), reqBody.get("password"));
             }
 
             case "/register": {
+                Json reqBody = (Json)request.payload;
                 if(!Validator.validateSchema(reqBody, new String[]{"name", "birthday", "gender",
                         "interest", "email", "password"})) {
-                    return new Response(400, "\"msg:\":\"" +
-                            "Missing key: \"" + reqBody.get("error") + "\"");
+                    return new Response(400, "\"msg:\":\" Missing key: \"" + reqBody.get("error") + "\"");
                 }
 
                 return UserService.register(reqBody);
+            }
+
+            case "/swipes": {
+                Json token = Json.parseJSON(Authorizer.parseToken(request.headers.token));
+                if(token == null)
+                    return new Response(401);
+                int id = Integer.parseInt(token.get("sub"));
+
+                Json[] reqBody = Json.parseJsonArray((String) request.payload);
+
+                for(var json : reqBody) {
+                    if(!Validator.validateSchema(json, new String[]{"id", "like"}))
+                        return new Response(400, "{\"msg:\":\" Missing key: \"" + json.get("error") + "\"}");
+                    UserService.handleSwipeVote(id, Integer.parseInt(json.get("id")), json.get("like").equals("true"));
+                }
+                return new Response(200, new Json());
             }
             default: return new Response(501);
         }

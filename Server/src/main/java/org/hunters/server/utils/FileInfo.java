@@ -15,6 +15,9 @@ public final class FileInfo {
     public final static String PUBLIC_HTML_DIR = System.getenv("PUBLIC_HTML") != null ?
                                                                                 System.getenv("PUBLIC_HTML")
                                                                              :  "Client/dist/client";
+    public final static String RESOURCES_DIR = System.getenv("RESOURCES") != null ?
+                                                                                System.getenv("RESOURCES")
+                                                                             :  "Server/src/main/resources";
 
     public static FileInfo get(Path path, Charset encoding) throws IOException {
         try (var fin = new FileInputStream(path.toString())){
@@ -60,6 +63,10 @@ public final class FileInfo {
 
     public static FileInfo json(byte[] data) {
         return new FileInfo("application/json", StandardCharsets.UTF_8, ByteBuffer.wrap(data));
+    }
+
+    public static FileInfo json(ByteBuffer byteBuffer) {
+        return new FileInfo("application/json", StandardCharsets.UTF_8, byteBuffer);
     }
 
     private final String MIMEType;

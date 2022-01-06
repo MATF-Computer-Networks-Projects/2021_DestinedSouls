@@ -26,11 +26,13 @@ const routes: Routes = [
   },
   {
     path: 'chat',
-    component: ChatComponent
+    component: ChatComponent,
+    canActivate: [AuthGuardService]
   },
   {
     path: 'swipe',
-    component: SwipeComponent
+    component: SwipeComponent,
+    canActivate: [AuthGuardService]
   }
 ];
 

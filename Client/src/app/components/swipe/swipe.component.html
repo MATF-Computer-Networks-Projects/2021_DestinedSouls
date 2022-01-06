@@ -5,17 +5,17 @@
     <p>No more candidates...</p>
   </div>
   <div *ngIf="displayCandidates; else no" >
-    <div *ngFor="let name of usersShown">
-      <mat-card class="example-card" *ngIf="name.show" style="position: absolute">
+    <div *ngFor="let user of usersShown">
+      <mat-card class="example-card" style="position: absolute">
         <mat-card-header>
-          <mat-card-title>{{name.name}}</mat-card-title>
+          <mat-card-title>{{user.name}}</mat-card-title>
         </mat-card-header>
-        <img mat-card-image [src]=name.path alt="Profile pic">
+        <img mat-card-image style="width: min-content" [src]="'/upload/profile/' + user.image" alt="Profile pic">
             <mat-card-content>
             </mat-card-content>
         <mat-card-actions>
-          <button mat-raised-button style="color: deepskyblue; background-color: whitesmoke" (click)="onVote(name.name,false)">Icy cold🧊</button>
-          <button mat-raised-button style="color: red ;background-color: coral" (click)="onVote(name.name,true)">Flaming HOT🚒</button>
+          <button mat-raised-button style="color: deepskyblue; background-color: whitesmoke" (click)="onVote(user,false)">Icy cold🧊</button>
+          <button mat-raised-button style="color: red ;background-color: coral" (click)="onVote(user,true)">Flaming HOT🚒</button>
         </mat-card-actions>
       </mat-card>
     </div>

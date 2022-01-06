@@ -1,23 +1,31 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpEvent} from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import { User } from 'src/app/models/user'
+import { LoggedUser, User } from 'src/app/models'
+import {Swipe} from "../models/swipe";
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  constructor(private http: HttpClient) { }
-
-  register(user: User): Observable<User> {
-    return this.http.post<User>('/users/register', user);
+  constructor(private http: HttpClient) {
   }
 
-  getOnline(): Observable<User[]> {
-    return this.http.get<User[]>('/users/getAll');
+  register(user: User): Observable<LoggedUser> {
+    return this.http.post<LoggedUser>('/users/register', user);
   }
+
+  getSwipes(): Observable<User[]> {
+    return this.http.get<User[]>('/users/swipes');
+  }
+
+  sendSwipeVotes(votes: Swipe[]) {
+    return this.http.post('/users/swipes', votes);
+  }
+
   upload(file: File, token: string): Observable<any> {
     const formData = new FormData();
     formData.append("thumbnail", file);
@@ -27,8 +35,5 @@ export class UserService {
       reportProgress: true,
       observe: 'events'
     });
-  }
-  download(name : string) : Observable<any>{
-    return this.http.get('')
   }
 }

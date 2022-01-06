@@ -33,6 +33,8 @@ public class Csv {
             while(matcher.find() && len++<numOfFields){
                 parsed.add(matcher.group(1).replaceAll("^\"|\"$", ""));
             }
+            if(len == numOfFields - 1)
+                parsed.add("placeholder.png");
             return parsed;
         } catch (IOException e) {
             e.printStackTrace();

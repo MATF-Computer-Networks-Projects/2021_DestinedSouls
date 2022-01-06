@@ -3,9 +3,12 @@ package org.hunters.server.protocols.http;
 import org.hunters.server.Message;
 import org.hunters.server.MessageReader;
 import org.hunters.server.Socket;
+import org.hunters.server.protocols.Protocol;
 import org.hunters.server.protocols.ws.WsHeaders;
 import org.hunters.server.protocols.ws.WsMessageReader;
 
+import java.io.IOException;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 
 
@@ -40,9 +43,9 @@ public class HttpMessageReader extends MessageReader {
 
             if(((HttpHeaders)this.nextMessage.metaData).ws != null) {
                 socket.messageReader = new WsMessageReader(this);
-                message.offset = 0;
-                message.length = 0;
                 message.metaData = new WsHeaders((HttpHeaders)this.nextMessage.metaData);
+                socket.protocol = Protocol.WS;
+                ((HttpHeaders)this.nextMessage.metaData).ws.socketId = socket.socketId;
             }
 
             nextMessage = message;

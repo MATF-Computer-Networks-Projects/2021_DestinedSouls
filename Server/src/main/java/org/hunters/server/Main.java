@@ -15,9 +15,8 @@ public class Main {
         var router = new Router();
         router.addRouteController("/users",  new UserController());
         router.addRouteController("/upload", new ResourceController());
-        router.addRouteController("/chat",   new ChatController());
 
-        MessageProcessor messageProcessor = new MessageProcessorImpl(router);
+        MessageProcessor messageProcessor = new MessageProcessor(router);
 
         UserService.load();
         Server server = new Server(3000, new HttpMessageReaderFactory(), messageProcessor);

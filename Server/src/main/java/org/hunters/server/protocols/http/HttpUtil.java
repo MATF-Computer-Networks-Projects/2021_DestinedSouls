@@ -224,6 +224,13 @@ public class HttpUtil {
             resolveMultipart(request, httpRequest);
             return;
         }
+        if(request.sharedArray[httpRequest.headers.bodyStartIndex] == (byte)'[') {
+            httpRequest.payload = new String( Arrays.copyOfRange(request.sharedArray,
+                                                                httpRequest.headers.bodyStartIndex,
+                                                                httpRequest.headers.bodyEndIndex)
+                                                        );
+            return;
+        }
         httpRequest.payload = new Json( new String( Arrays.copyOfRange(request.sharedArray,
                                                     httpRequest.headers.bodyStartIndex,
                                                     httpRequest.headers.bodyEndIndex)
@@ -243,7 +250,7 @@ public class HttpUtil {
         int endLine = HttpUtil.findNextLineBreak(request.sharedArray, filenameIndex, httpHeaders.bodyEndIndex)-2; // "CR
 
         var filename = HttpUtil.sliceAsString(request.sharedArray, filenameIndex, endLine);
-        httpRequest.other.put("filename", filename);
+        httpRequest.setValue("filename", filename);
 
         endLine += 3;
 

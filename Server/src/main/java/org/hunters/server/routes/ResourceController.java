@@ -24,24 +24,30 @@ public class ResourceController implements IController {
 
     private Response handleHttp(HttpRequest request) {
         switch (request.headers.httpMethod) {
-            case GET:  { return get(request.headers.url); }
+            case GET:  {
+                if(request.headers.token == null)
+                    return get(request.headers.url);
+            }
             case POST: { return post(request); }
-            //case HEAD:
-            //case PUT:
-            //case DELETE: { response.writeToMessage(StorageService.cache.get("501").duplicate());  break; }
             default: {    return new Response(405); }
         }
     }
 
     static Response get(String url) {
-        String filename = FileInfo.getFilename(url);
+        if(url.startsWith("/profile"))
+            return get(StorageService.uploadsDir.toString(), url.substring(url.lastIndexOf('/')+1));
+        else
+            return get(FileInfo.PUBLIC_HTML_DIR, FileInfo.getFilename(url));
+    }
+
+    static Response get(String parent, String filename) {
         if (!StorageService.cache.contains(filename)) {
-            var path = Paths.get(FileInfo.PUBLIC_HTML_DIR, url);
+            var path = Paths.get(parent, filename);
             if (Files.isRegularFile(path)) {
                 try {
                     StorageService.cache.put(
-                        filename,
-                        Responses.createResponseBuffer(FileInfo.get(path, StandardCharsets.UTF_8))
+                            filename,
+                            Responses.createResponseBuffer(FileInfo.get(path, StandardCharsets.UTF_8))
                     );
                 } catch (IOException e) {
                     return new Response(405);
@@ -49,7 +55,7 @@ public class ResourceController implements IController {
             }
         }
 
-        return new Response(200, "\"filename\":\"" + filename + '\"');
+        return new Response(200, "{\"filename\":\"" + filename + "\"}");
     }
 
 
@@ -64,10 +70,10 @@ public class ResourceController implements IController {
         try {
             int id = Integer.parseInt(tokenParsed.get("sub"));
 
-            if(!request.other.containsKey("filename"))
+            if(!request.hasValue("filename"))
                 return new Response(400);
 
-            String filename = request.other.get("filename");
+            String filename = request.getValue("filename");
 
 
             Path imgPath = StorageService.store((byte[])request.payload, filename);

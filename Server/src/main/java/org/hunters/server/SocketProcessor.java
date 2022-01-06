@@ -1,7 +1,5 @@
 package org.hunters.server;
 
-import org.hunters.server.services.StorageService;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
@@ -20,10 +18,9 @@ public class SocketProcessor {
 
     private MessageReaderFactory messageReaderFactory = null;
 
-    private Queue<Message> outboundMessageQueue = new LinkedList<>();
+    private final Queue<Message> outboundMessageQueue = new LinkedList<>();
 
     private final Map<Long, Socket> socketMap         = new HashMap<>();
-    // private final Map<Long, WsImpl> webSocketMap      = new HashMap<>();
 
     private final ByteBuffer readByteBuffer  = ByteBuffer.allocate(1024 * 1024);
     private final ByteBuffer writeByteBuffer = ByteBuffer.allocate(1024 * 1024);
@@ -35,11 +32,9 @@ public class SocketProcessor {
 
     private long              nextSocketId = 16 * 1024; //start incoming socket ids from 16K - reserve bottom ids for pre-defined sockets (servers).
 
-    private Set<Socket> emptyToNonEmptySockets = new HashSet<>();
-    private Set<Socket> nonEmptyToEmptySockets = new HashSet<>();
+    private final Set<Socket> emptyToNonEmptySockets = new HashSet<>();
+    private final Set<Socket> nonEmptyToEmptySockets = new HashSet<>();
 
-    private long       cacheTimeout;
-    private final long cacheTtl = 5000;
 
     public SocketProcessor(Queue<Socket> inboundSocketQueue, MessageBuffer readMessageBuffer, MessageBuffer writeMessageBuffer, MessageReaderFactory messageReaderFactory, MessageProcessor messageProcessor) throws IOException {
         this.inboundSocketQueue   = inboundSocketQueue;
@@ -54,26 +49,14 @@ public class SocketProcessor {
 
         this.readSelector         = Selector.open();
         this.writeSelector        = Selector.open();
-
-        this.cacheTimeout         = System.currentTimeMillis();
     }
 
     public void run() {
         //noinspection InfiniteLoopStatement
         while(true){
-            try{
-                if(System.currentTimeMillis() - this.cacheTimeout > cacheTtl) {
-                    StorageService.resetLocalCache();
-                    this.cacheTimeout = System.currentTimeMillis();
-                }
-
+            try {
                 executeCycle();
-                /*
-                for(WsImpl ws : webSocketMap.values())
-                    ;
-                 */
-
-            } catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -136,13 +119,7 @@ public class SocketProcessor {
         if(fullMessages.size() > 0){
             for(Message message : fullMessages){
                 message.socketId = socket.socketId; // TODO: add protocol too
-                this.messageProcessor.process(message, this.writeProxy);  //the message processor will eventually push outgoing messages into an IMessageWriter for this socket.
-                /*
-                if(socket.protocol == Protocol.WS && !this.webSocketMap.containsKey(socket.socketId)) {
-                    socket.messageReader = new WsMessageReader(socket.messageReader);
-                    this.socketMap.remove(socket.socketId);
-                    this.webSocketMap.put(socket.socketId, new WsImpl(socket));
-                }*/
+                this.messageProcessor.process(message, this.writeProxy);
             }
             fullMessages.clear();
         }
