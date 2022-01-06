@@ -21,16 +21,6 @@ export class HomepageComponent implements OnInit {
     this.router.navigateByUrl('/login');
   }
 
-  onGetAll() {
-    this.userService.getAll().subscribe(
-      data => {
-        console.log(`Data: ${data}`);
-      },
-      error => {
-        console.error(error);
-      });
-  }
-
   onChat() {
     this.router.navigateByUrl('/chat');
   }

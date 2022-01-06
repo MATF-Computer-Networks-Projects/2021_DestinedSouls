@@ -15,6 +15,9 @@ public class UserTable {
         this.inMemTable.put(user.id, user);
     }
 
+    public void remove(User user)   { this.inMemTable.remove(user.id); }
+    public void remove(int id)      { this.inMemTable.remove(id); }
+
     public boolean hasId(int id) {
         return inMemTable.containsKey(id);
     }

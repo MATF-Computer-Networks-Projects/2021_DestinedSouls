@@ -3,7 +3,6 @@ package org.hunters.server.models.users;
 import org.hunters.server.models.ChatMessage;
 import org.hunters.server.security.Authorizer;
 
-import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -21,7 +20,6 @@ public class User {
     private final HashSet<Integer> blacklist = new HashSet<>();
     private final HashSet<Integer> matches   = new HashSet<>();
     public  long  socketId = -1;
-    private final boolean notifyUser = false;
 
     public final LinkedList<ChatMessage> pendingMessages = new LinkedList<>();
 

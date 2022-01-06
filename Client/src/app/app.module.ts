@@ -8,8 +8,10 @@ import { APP_BASE_HREF, LocationStrategy, HashLocationStrategy } from '@angular/
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
-import { MatSidenavModule } from "@angular/material/sidenav";
 import {MatButtonModule} from '@angular/material/button';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatDividerModule } from '@angular/material/divider';
 
 import { AppComponent } from './app.component';
 import { httpInterceptorProviders } from './services/http-interceptors';
@@ -17,8 +19,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LoginComponent } from './components';
 import { HomepageComponent } from './components';
 import { RegisterComponent } from './components';
-import { ChatComponent } from './components';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ChatComponent } from './components/chat/chat.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +43,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatIconModule,
     MatProgressBarModule,
     MatSidenavModule,
-    MatButtonModule
+    MatButtonModule,
+    MatDividerModule
   ],
   providers: [
     { provide: APP_BASE_HREF, useValue: '/'},
