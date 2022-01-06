@@ -6,6 +6,7 @@ export interface User {
   birthday?: string;
   gender?: Gender;
   interest?: Interest;
+  image?: string;
 }
 
 export interface MatchUser extends User {

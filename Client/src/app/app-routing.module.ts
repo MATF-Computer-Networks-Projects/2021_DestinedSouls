@@ -4,7 +4,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomepageComponent,
          LoginComponent,
          RegisterComponent,
-         ChatComponent
+         ChatComponent,
+         SwipeComponent
         } from 'src/app/components'
 
 import { AuthGuardService } from 'src/app/services'
@@ -26,6 +27,11 @@ const routes: Routes = [
   {
     path: 'chat',
     component: ChatComponent,
+    canActivate: [AuthGuardService]
+  },
+  {
+    path: 'swipe',
+    component: SwipeComponent,
     canActivate: [AuthGuardService]
   }
 ];

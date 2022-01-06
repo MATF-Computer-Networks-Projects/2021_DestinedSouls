@@ -1,4 +1,15 @@
-<div>
-  <button (click)="onLogout()">Logout</button>  
-  <button (click)="onChat()">Chat</button> 
+<div class="app-form">
+<mat-card class="example-card">
+  <mat-card-header>
+    <mat-card-title>{{user.name}}</mat-card-title>
+  </mat-card-header>
+  <img mat-card-image [src]="path"  alt="Profile pic">
+  <mat-card-content>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button (click)="onChat()">Chat</button>
+    <button mat-button (click)="onSwipe()">Swipe</button>
+    <button mat-button (click)="onLogout()">Logout</button>
+  </mat-card-actions>
+</mat-card>
 </div>

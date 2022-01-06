@@ -224,6 +224,13 @@ public class HttpUtil {
             resolveMultipart(request, httpRequest);
             return;
         }
+        if(request.sharedArray[httpRequest.headers.bodyStartIndex] == (byte)'[') {
+            httpRequest.payload = new String( Arrays.copyOfRange(request.sharedArray,
+                                                                httpRequest.headers.bodyStartIndex,
+                                                                httpRequest.headers.bodyEndIndex)
+                                                        );
+            return;
+        }
         httpRequest.payload = new Json( new String( Arrays.copyOfRange(request.sharedArray,
                                                     httpRequest.headers.bodyStartIndex,
                                                     httpRequest.headers.bodyEndIndex)

@@ -14,7 +14,10 @@ public final class FileInfo {
 
     public final static String PUBLIC_HTML_DIR = System.getenv("PUBLIC_HTML") != null ?
                                                                                 System.getenv("PUBLIC_HTML")
-                                                                             :  "client/dist/client";
+                                                                             :  "Client/dist/client";
+    public final static String RESOURCES_DIR = System.getenv("RESOURCES") != null ?
+                                                                                System.getenv("RESOURCES")
+                                                                             :  "Server/src/main/resources";
 
     public static FileInfo get(Path path, Charset encoding) throws IOException {
         try (var fin = new FileInputStream(path.toString())){

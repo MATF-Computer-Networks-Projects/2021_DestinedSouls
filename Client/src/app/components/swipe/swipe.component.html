@@ -1,0 +1,21 @@
+<div class="app-form" >
+  <div style="position: relative">
+    <button mat-icon-button class="btnBack" (click)="onHome()"><mat-icon>arrow_left_alt</mat-icon><mat-icon>home</mat-icon></button><br>
+    <br>
+    <p *ngIf="usersShown.length === 0">No more candidates...</p>
+  </div>
+  <div *ngIf="displayCandidates && usersShown.length > 0;" >
+      <mat-card class="example-card">
+        <mat-card-header>
+          <mat-card-title>{{usersShown[0].name}}</mat-card-title>
+        </mat-card-header>
+        <img mat-card-image [src]="'/upload/profile/' + usersShown[0].image" alt="Profile pic">
+            <mat-card-content>
+            </mat-card-content>
+        <mat-card-actions style="display: flex;">
+          <button mat-raised-button style="color: deepskyblue; background-color: whitesmoke" (click)="onVote(usersShown[0],false)">Icy cold🧊</button>
+          <button mat-raised-button style="color: red ;background-color: coral" (click)="onVote(usersShown[0],true)">Flaming HOT🚒</button>
+        </mat-card-actions>
+      </mat-card>
+  </div>
+</div>

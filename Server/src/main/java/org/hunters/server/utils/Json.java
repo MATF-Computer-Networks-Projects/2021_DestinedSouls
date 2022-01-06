@@ -39,6 +39,18 @@ public class Json {
         return parsed;
     }
 
+    public static Json[] parseJsonArray(String data) {
+        if(data == null)
+            return null;
+        int offset = data.charAt(0) == '[' ? 1 : 0;
+        int end    = data.charAt(data.length()-1) == ']' ? data.length()-2 : data.length()-1;
+        String[] swipes = data.substring(offset+1, end).split("},\\{");
+        Json[] jsonArr = new Json[swipes.length];
+        for (int i = 0; i < swipes.length; i++)
+            jsonArr[i] = Json.parseJSON(swipes[i]);
+        return jsonArr;
+    }
+
     public int getSize() { return jsonObj.size(); }
 
     @Override

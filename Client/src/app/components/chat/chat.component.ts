@@ -10,15 +10,13 @@ import {WebsocketService} from "../../services/websocket.service";
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
-  styleUrls: ['./chat.component.css'],
-  providers: [WebsocketService, ChatService]
+  styleUrls: ['./chat.component.css']
 })
 
 export class ChatComponent implements OnInit, OnDestroy{
 
   chatActiveWith : BehaviorSubject<MatchUser>;
 
-  // chatActiveWith : MatchUser;
   displayChat: boolean = true;
   displayOnline : boolean = true;
 
@@ -70,6 +68,7 @@ export class ChatComponent implements OnInit, OnDestroy{
   }
 
   ngOnDestroy() {
+    // write to local storage
   }
 
   openChatWith(user: MatchUser) {

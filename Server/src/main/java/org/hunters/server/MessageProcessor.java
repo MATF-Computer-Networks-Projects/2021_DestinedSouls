@@ -1,20 +1,12 @@
 package org.hunters.server;
 
-import org.hunters.server.models.users.User;
 import org.hunters.server.protocols.http.*;
 import org.hunters.server.protocols.ws.WsHeaders;
 import org.hunters.server.protocols.ws.WsMessageProcessor;
 import org.hunters.server.routes.Router;
 import org.hunters.server.services.StorageService;
-import org.hunters.server.services.UserService;
-import org.hunters.server.utils.FileInfo;
-import org.hunters.server.utils.Response;
-import org.hunters.server.utils.Responses;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Map;
+import java.io.IOException;
 
 public class MessageProcessor {
 
@@ -23,6 +15,11 @@ public class MessageProcessor {
 
     public MessageProcessor(Router router) {
         httpMessageProcessor.router = router;
+        try {
+            StorageService.resetLocalCache();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void process(Message request, WriteProxy writeProxy) {

@@ -6,7 +6,6 @@ import java.util.Map;
 public class HttpRequest {
     public HttpHeaders         headers;
     public Object              payload = null;
-    // private Map<String, String> other = new HashMap<>();
     private Map<String, String> other = null;
 
     public String getValue(String key) {

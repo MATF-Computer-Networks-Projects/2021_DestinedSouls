@@ -1,7 +1,5 @@
 package org.hunters.server;
 
-import org.hunters.server.services.StorageService;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
@@ -37,8 +35,6 @@ public class SocketProcessor {
     private final Set<Socket> emptyToNonEmptySockets = new HashSet<>();
     private final Set<Socket> nonEmptyToEmptySockets = new HashSet<>();
 
-    private long       cacheTimeout;
-    private final long cacheTtl = 30000;
 
     public SocketProcessor(Queue<Socket> inboundSocketQueue, MessageBuffer readMessageBuffer, MessageBuffer writeMessageBuffer, MessageReaderFactory messageReaderFactory, MessageProcessor messageProcessor) throws IOException {
         this.inboundSocketQueue   = inboundSocketQueue;
@@ -53,8 +49,6 @@ public class SocketProcessor {
 
         this.readSelector         = Selector.open();
         this.writeSelector        = Selector.open();
-
-        this.cacheTimeout         = System.currentTimeMillis();
     }
 
     public void run() {

@@ -6,6 +6,7 @@ import org.hunters.server.models.users.User;
 import org.hunters.server.models.users.UserTable;
 import org.hunters.server.security.Authorizer;
 import org.hunters.server.utils.Csv;
+import org.hunters.server.utils.FileInfo;
 import org.hunters.server.utils.Json;
 import org.hunters.server.utils.Response;
 
@@ -17,7 +18,7 @@ import java.util.function.Predicate;
 public class UserService {
     private final static UserTable inMemUserTable = new UserTable();
     private final static MatchesTable matchesTable = new MatchesTable();
-    private final static Csv data = new Csv("server/src/main/resources/data.csv");
+    private final static Csv data = new Csv(FileInfo.RESOURCES_DIR + "/data.csv");
 
     public final static HashSet<Long> socketsToClose = new HashSet<>();
 
@@ -39,14 +40,14 @@ public class UserService {
 
         // TODO: Get initial matches from file
         var admin = getById(0);
-        for(int i = 0; i < 5; i++) {
-            var match = getIf(user -> admin.suggestUser(user));
-            if(match == null)
-                break;
-            int matchId = matchesTable.addMatch(admin.id, match.id);
-            admin.addNewMatch(matchId, match.id);
-            match.addNewMatch(matchId, admin.id);
-        }
+        assert admin != null;
+        inMemUserTable.mapFirstNThat(5, admin::suggestUser,
+                entry -> {
+                    int chatId = matchesTable.addMatch(admin.id, entry.id);
+                    entry.addNewMatch(chatId, admin.id);
+                    admin.addNewMatch(chatId, entry.id);
+                    return entry;
+                });
     }
 
     public static User getById(int id) {
@@ -55,21 +56,39 @@ public class UserService {
         return null;
     }
 
-    public static List<User> getAll(int id) {
-        if(inMemUserTable.hasId(id))
-        {
-            return new LinkedList<User>(inMemUserTable.getAll());
-        }
-        return null;
+    /**
+     * Fetching compatible users with a limit of 10 per request.
+     *
+     * @return Potential matches chosen using [criteria]
+     */
+    public static User[] getSwipes(int id) {
+        User user = inMemUserTable.getById(id);
+        // TODO: Add timeout
+
+        User[] picks = inMemUserTable.getFirstNThat(3, user::suggestUser);
+
+        // TODO: First pick bigger batch, and afterwards select 10 by giving them probability (based on age deviation)
+
+        return picks;
     }
 
-    private static User getIf(Predicate<User> p){
-        for(User user : inMemUserTable.getAll()) {
-            if(p.test(user))
-                return user;
+    public static void handleSwipeVote(int userId, int swipeId, boolean like) {
+        User user = inMemUserTable.getById(userId);
+        User swipe = inMemUserTable.getById(swipeId);
+        if(like) {
+            if(swipe.hasLiked(user.id)) {
+                System.out.println("New match: " + user.name + " " + swipe.name);
+                addMatch(user, swipe);
+                return;
+            }
+            if(!swipe.suggestUser(user)) {
+                user.blacklistUser(swipe);
+                return;
+            }
+            user.addLike(swipe.id);
         }
-
-        return null;
+        else
+            user.blacklistUser(swipe);
     }
 
     private static String formattedMatch(int matchId, int userId) {
@@ -93,6 +112,12 @@ public class UserService {
         return sb.toString();
     }
 
+    private static void addMatch(User user1, User user2) {
+        int chatId = matchesTable.addMatch(user1.id, user2.id);
+        user1.addNewMatch(chatId, user2.id);
+        user2.addNewMatch(chatId, user1.id);
+    }
+
     /*
      * It is assumed that json schema is valid
      */
@@ -105,7 +130,7 @@ public class UserService {
         return "\"name\":\"" + user.name + "\"," +
                 "\"email\":\"" + user.email + "\"," +
                 "\"birthday\":\"" + user.getBday() + '\"' +
-            (user.image != null ? "\"image\":\"" + user.image + '\"' : "");
+                ",\"image\":\"" + user.image + '\"';
     }
 
     /*
@@ -132,7 +157,7 @@ public class UserService {
      * email does not exist, null returned. If password is wrong empty string is returned
     */
     public static Response authenticate(String reqEmail, String reqPassword) {
-        User user = getIf(user1 -> user1.email.equals(reqEmail));
+        User user = inMemUserTable.getFirstThat(user1 -> user1.email.equals(reqEmail));
         if(user == null) {
             System.out.println("User does not exist");
             return new Response(404);
@@ -154,7 +179,7 @@ public class UserService {
      * @return Formatted user as string without password. If user with provided email does not exist, null returned
      */
     public static Response register(Json user) {
-        if(getIf(user1 -> user1.email.equals(user.get("email"))) != null)
+        if(inMemUserTable.getFirstThat(user1 -> user1.email.equals(user.get("email"))) != null)
             return new Response(403);
         User newUser = userFromJson(user);
         inMemUserTable.add(newUser);

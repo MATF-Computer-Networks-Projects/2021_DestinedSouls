@@ -93,6 +93,9 @@ public class HttpMessageProcessor {
         var res = ChatController.onHttpHandle(headers);
         if(res.status == 101) {
             User user = UserService.getById(Integer.parseInt(res.json.get("userId")));
+            response.writeToMessage( Responses.createSwitchingProtocols(res.json.get("key")) );
+            writeProxy.enqueue(response);
+            /*
             while(!user.pendingMessages.isEmpty()) {
                 var msg = user.pendingMessages.remove();
                 var newMsg = writeProxy.getMessage();
@@ -100,8 +103,7 @@ public class HttpMessageProcessor {
                 newMsg.writeToMessage(Responses.wsResponse((byte)-127, msg.asJsonString()));
                 writeProxy.enqueue(newMsg);
             }
-            response.writeToMessage( Responses.createSwitchingProtocols(res.json.get("key")) );
-            writeProxy.enqueue(response);
+             */
         }
     }
 }
