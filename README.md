@@ -3,9 +3,9 @@
 A dating platform that connects two users who like each other. Upon successfully registering and logging in user will be prompted to the home page, there he'll be able to either Swipe potential candidates or Chat with his matches.
 
 ## Technologies
-**Client:**[![Angular](https://img.shields.io/badge/Angular-13.0.0-red)](https://angular.io/)
+**Client:** [![Angular](https://img.shields.io/badge/Angular-13.0.0-red)](https://angular.io/)
 
-**Server:**[![Java](https://img.shields.io/badge/Java-11.0.2-blue)](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html)
+**Server:** [![Java](https://img.shields.io/badge/Java-11.0.2-blue)](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html)
 
 **IDE:** [![IDEA](https://img.shields.io/badge/Intellij-IDEA-blueviolet)](https://www.jetbrains.com/idea/download/)
 
