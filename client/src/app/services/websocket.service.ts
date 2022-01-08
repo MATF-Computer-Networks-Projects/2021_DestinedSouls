@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer, Subject } from 'rxjs';
-import {Router} from "@angular/router";
 
 import {Message} from "../models";
 
 @Injectable()
 export class WebsocketService {
-  constructor(private router: Router) { }
+  constructor() { }
 
   private subject: Subject<MessageEvent>;
 

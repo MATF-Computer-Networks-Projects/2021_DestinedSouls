@@ -1,19 +1,16 @@
-<mat-drawer-container *ngIf="displayOnline" class = "chatMenu">
+<mat-drawer-container class = "chatMenu">
     <mat-drawer class="sideNav" mode="side" opened>
         <br>
         <button mat-icon-button class="btnBack" (click)="toHome()"><mat-icon>arrow_left_alt</mat-icon><mat-icon>home</mat-icon></button><br>
-    <div *ngIf="displayOnline; else noOnline" class="listMatches">
-      <div *ngFor="let user of matches">
-        <button mat-flat-button (click)="openChatWith(user)" class="btnOnline" ><a style="color: #00af2e">•</a> {{user.name}} </button>
-      </div>
-    </div>
-      <ng-template #noOnline>
-        <p> No online users.... </p>
-      </ng-template>
+        <div *ngIf="displayChat" class="listMatches">
+          <div *ngFor="let user of matches">
+            <button mat-flat-button (click)="openChatWith(user)" class="btnOnline" ><a style="color: #00af2e">•</a> {{user.name}} </button>
+          </div>
+        </div>
     </mat-drawer>
 
     <mat-drawer-content class="msgBox">
-        <div *ngIf ="displayChat && chatActiveWith.value.messages">
+        <div *ngIf ="displayChat && chatActiveWith.value.messages; else noChat">
             <div>
                 <h3>{{chatActiveWith.value.name}}</h3>
             </div>
@@ -34,3 +31,7 @@
     </mat-drawer-content>
 </mat-drawer-container>
 
+<ng-template #noChat>
+  <p> You don't have any matches.... </p>
+  <button mat-flat-button (click)="toMatches()"> Find your soulmate </button>
+</ng-template>

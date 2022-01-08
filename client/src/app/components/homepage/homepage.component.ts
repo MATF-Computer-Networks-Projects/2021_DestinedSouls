@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { Router } from '@angular/router'
 import {AuthenticationService, ChatService, UserService} from 'src/app/services'
 import {LoggedUser, User} from "../../models";
@@ -8,7 +8,7 @@ import {LoggedUser, User} from "../../models";
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.css']
 })
-export class HomepageComponent implements OnInit {
+export class HomepageComponent implements OnInit, OnDestroy {
   public user: LoggedUser;
   public path: string;
 
@@ -20,6 +20,10 @@ export class HomepageComponent implements OnInit {
   ngOnInit(): void {
     this.user = this.authenticationService.currentUserValue;
     this.path = 'upload/profile/' + this.user.image;
+  }
+
+  ngOnDestroy() {
+    this.chatService.messages.complete();
   }
 
   onLogout() {

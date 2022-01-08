@@ -9,10 +9,8 @@ import java.util.Queue;
 
 public class SocketAcceptor implements Runnable{
 
-    private int port = 0;
-    private ServerSocketChannel serverSocket = null;
-
-    private Queue<Socket> socketQueue = null;
+    private final int port;
+    private final Queue<Socket> socketQueue;
 
     public SocketAcceptor(int tcpPort, Queue<Socket> socketQueue)  {
         this.port     = tcpPort;
@@ -21,9 +19,11 @@ public class SocketAcceptor implements Runnable{
 
     @Override
     public void run() {
+        ServerSocketChannel serverSocket = null;
         try{
-            this.serverSocket = ServerSocketChannel.open();
-            this.serverSocket.bind(new InetSocketAddress(port));
+            serverSocket = ServerSocketChannel.open();
+            serverSocket.bind(new InetSocketAddress(port));
+            System.out.println("Server listening on port " + port);
         } catch(IOException e){
             e.printStackTrace();
             return;
@@ -32,7 +32,7 @@ public class SocketAcceptor implements Runnable{
         //noinspection InfiniteLoopStatement
         while(true){
             try{
-                SocketChannel socketChannel = this.serverSocket.accept();
+                SocketChannel socketChannel = serverSocket.accept();
 
                 System.out.println("Socket accepted: " + socketChannel);
 
