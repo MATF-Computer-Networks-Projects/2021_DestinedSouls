@@ -20,7 +20,7 @@ export class ChatComponent implements OnInit {
   displayChat: boolean = true;
   displayOnline : boolean = true;
 
-  messagePending: ChatMessage[] = [];
+  messagePending: Message[] = [];
 
   matches: MatchUser[];
   messages$: Subject<Message>;
@@ -41,10 +41,12 @@ export class ChatComponent implements OnInit {
     this.messages$ = chatService.messages;
     this.messages$.subscribe(
       (msg: Message) => {
-            if(!msg.msg) {
+              console.log(msg);
+            if(!msg.msg && msg.id) {
               if(this.messagePending.length > 0) {
-                this.chatActiveWith.value.messages.push(this.messagePending[0]);
-                this.messagePending = this.messagePending.slice(1, -1);
+                const idx = this.messagePending.findIndex(value => value.id === msg.id);
+                this.matches.find(m => m.id === msg.id).messages.push({received: false, msg: this.messagePending[idx].msg});
+                this.messagePending.splice(idx, 1);
               }
               return;
             }
@@ -94,9 +96,6 @@ export class ChatComponent implements OnInit {
       id:    this.chatActiveWith.value.id,
       msg:   messageCurrent
     });
-
-    this.chatActiveWith.value.messages.push({received: false, msg: messageCurrent});
+    this.messagePending.push({id: this.chatActiveWith.value.id, msg: messageCurrent});
   }
-
-
 }

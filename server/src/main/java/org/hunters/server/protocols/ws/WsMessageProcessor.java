@@ -33,14 +33,17 @@ public class WsMessageProcessor {
             return;
         }
 
+        response.writeToMessage( Responses.wsResponse(frame.encoded(), "{\"id\":\"" + res.json.get("id") + "\"}") );
+        writeProxy.enqueue(response);
+
         int targetSocketId = Integer.parseInt(res.json.remove("socketId"));
-        response.socketId = targetSocketId;
         if(targetSocketId != -1) {
-            response.writeToMessage( Responses.wsResponse(frame.encoded(),  res.json.toString() ) );
-            writeProxy.enqueue(response);
+            var messageToUser = writeProxy.getMessage();
+            messageToUser.socketId = targetSocketId;
+            messageToUser.writeToMessage(Responses.wsResponse(frame.encoded(),  res.json.toString() ));
+            writeProxy.enqueue(messageToUser);
         }
     }
-
 
 
     private String appendSocketId(Message request, int endIdx) {

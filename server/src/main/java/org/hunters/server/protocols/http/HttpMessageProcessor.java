@@ -4,6 +4,7 @@ import org.hunters.server.Message;
 import org.hunters.server.MessageProcessor;
 import org.hunters.server.WriteProxy;
 import org.hunters.server.models.users.User;
+import org.hunters.server.protocols.ws.WsHeaders;
 import org.hunters.server.routes.ChatController;
 import org.hunters.server.routes.Router;
 import org.hunters.server.services.StorageService;
@@ -96,10 +97,11 @@ public class HttpMessageProcessor {
 
         var res = ChatController.onHttpHandle(headers);
         if(res.status == 101) {
-            User user = UserService.getById(Integer.parseInt(res.json.get("userId")));
             response.writeToMessage( Responses.createSwitchingProtocols(res.json.get("key")) );
             writeProxy.enqueue(response);
-            /*
+
+            User user = UserService.getById(Integer.parseInt(res.json.get("userId")));
+
             while(!user.pendingMessages.isEmpty()) {
                 var msg = user.pendingMessages.remove();
                 var newMsg = writeProxy.getMessage();
@@ -107,7 +109,9 @@ public class HttpMessageProcessor {
                 newMsg.writeToMessage(Responses.wsResponse((byte)-127, msg.asJsonString()));
                 writeProxy.enqueue(newMsg);
             }
-             */
+            return;
         }
+        response.writeToMessage( StorageService.cache.get(String.valueOf(res.status)) );
+        writeProxy.enqueue(response);
     }
 }

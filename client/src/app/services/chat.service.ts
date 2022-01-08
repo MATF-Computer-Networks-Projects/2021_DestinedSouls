@@ -5,7 +5,8 @@ import { WebsocketService } from './websocket.service';
 import {Message, ChatMessage, ChatConversation} from "../models";
 import {AuthenticationService} from "./authentication.service";
 
-const CHAT_URL = "ws://" + window.location.href.split('/')[2] + "/chat";
+//const CHAT_URL = "ws://" + window.location.href.split('/')[2] + "/chat";
+const CHAT_URL = "ws://" + window.location.href.split('/')[2].split(':')[0] + ":3000/chat";
 
 @Injectable()
 export class ChatService {
@@ -21,6 +22,8 @@ export class ChatService {
         if(data.msg)
           return { id: data.id, msg: data.msg };
 
+        if(data.id)
+          return { id: data.id }
         return {}
       }));
   }
