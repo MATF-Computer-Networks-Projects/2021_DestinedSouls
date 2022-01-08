@@ -28,7 +28,10 @@ export class HomepageComponent implements OnInit, OnDestroy {
 
   onLogout() {
     this.authenticationService.logout();
-    this.router.navigateByUrl('/login');
+    this.router.navigateByUrl('/login')
+      .then(() => {
+        window.location.reload();
+      });
   }
 
   onChat() {
