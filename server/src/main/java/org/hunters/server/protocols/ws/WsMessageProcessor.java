@@ -33,6 +33,13 @@ public class WsMessageProcessor {
             return;
         }
 
+        //response.writeToMessage(Responses.wsResponse(frame.encoded(), "{}"));
+        //writeProxy.enqueue(response);
+        var responseToSocket = writeProxy.getMessage();
+        responseToSocket.socketId = request.socketId;
+        responseToSocket.writeToMessage(Responses.wsResponse(frame.encoded(), "{\"id\":\"" + res.json.get("id") + "\"}"));
+        writeProxy.enqueue(responseToSocket);
+
         int targetSocketId = Integer.parseInt(res.json.remove("socketId"));
         response.socketId = targetSocketId;
         if(targetSocketId != -1) {

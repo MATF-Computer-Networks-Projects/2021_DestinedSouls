@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import { Router } from '@angular/router'
 import {AuthenticationService, ChatService, UserService} from 'src/app/services'
-import {LoggedUser, User} from "../../models";
+import {LoggedUser, Message, User} from "../../models";
 
 @Component({
   selector: 'app-homepage',
@@ -15,7 +15,17 @@ export class HomepageComponent implements OnInit, OnDestroy {
   constructor(private authenticationService: AuthenticationService,
               private userService: UserService,
               private chatService: ChatService,
-              private router: Router) { }
+              private router: Router) {
+    this.chatService.messages.subscribe(
+      (msg: Message) => {
+        console.log(`Response from ${msg.id}: ${msg.msg}`);
+        if (msg.id && msg.msg) {
+          this.authenticationService.currentUserValue.matches.find(m => m.id === msg.id)
+            .messages.push({received: !msg.token, msg: msg.msg});
+        }
+      }
+    );
+  }
 
   ngOnInit(): void {
     this.user = this.authenticationService.currentUserValue;
