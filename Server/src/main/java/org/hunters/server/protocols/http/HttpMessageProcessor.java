@@ -60,8 +60,12 @@ public class HttpMessageProcessor {
 
     private ByteBuffer respond(Response response) {
         if(response.status == 200) {
-            if(response.json.hasKey("filename"))
-                return StorageService.cache.get(response.json.get("filename")).duplicate();
+            if(response.json.hasKey("filename")) {
+                if(StorageService.cache.contains(response.json.get("filename")))
+                    return StorageService.cache.get(response.json.get("filename")).duplicate();
+                else
+                    return StorageService.cache.get("500");
+            }
             else if(response.json.hasKey("jsonArray"))
                 return Responses.createResponseBuffer( FileInfo.json(response.json.get("jsonArray").getBytes()) );
             else if(response.json.hasKey("matches")) {

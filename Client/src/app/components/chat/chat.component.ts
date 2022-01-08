@@ -13,7 +13,7 @@ import {WebsocketService} from "../../services/websocket.service";
   styleUrls: ['./chat.component.css']
 })
 
-export class ChatComponent implements OnInit, OnDestroy{
+export class ChatComponent implements OnInit {
 
   chatActiveWith : BehaviorSubject<MatchUser>;
 
@@ -35,7 +35,7 @@ export class ChatComponent implements OnInit, OnDestroy{
 
     this.matches = this.authenticationService.currentUserValue.matches;
     this.chatActiveWith = new BehaviorSubject<MatchUser>(this.matches[0]);
-    this.displayChat = this.chatActiveWith ? true : false;
+    this.displayChat = this.matches && this.matches.length > 0;
 
 
     this.messages$ = chatService.messages;
@@ -51,7 +51,7 @@ export class ChatComponent implements OnInit, OnDestroy{
             console.log(`Response from ${msg.id}: ${msg.msg}`);
             if(msg.id){
               this.matches.find(m => m.id === msg.id)
-                      .messages.push({received: msg.token ? false : true, msg: msg.msg});
+                      .messages.push({received: !msg.token, msg: msg.msg});
             }
           },
       error => {
@@ -67,10 +67,6 @@ export class ChatComponent implements OnInit, OnDestroy{
     console.log(this.matches)
   }
 
-  ngOnDestroy() {
-    // write to local storage
-  }
-
   openChatWith(user: MatchUser) {
     this.chatActiveWith.next(user);
     this.displayChat = true;
@@ -78,6 +74,10 @@ export class ChatComponent implements OnInit, OnDestroy{
 
   toHome() {
     this.router.navigateByUrl('/');
+  }
+
+  toMatches() {
+    this.router.navigateByUrl('/swipe');
   }
 
   onSend() {
@@ -95,7 +95,6 @@ export class ChatComponent implements OnInit, OnDestroy{
       msg:   messageCurrent
     });
 
-    // this.messagePending.push({received: false, msg: messageCurrent});
     this.chatActiveWith.value.messages.push({received: false, msg: messageCurrent});
   }
 
