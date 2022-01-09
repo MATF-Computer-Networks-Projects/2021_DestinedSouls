@@ -5,23 +5,44 @@ A dating platform that connects two users who like each other. Upon successfully
 
 ## Technologies
 
-**Client:** [![Angular](https://img.shields.io/badge/Angular-13.0.0-red)](https://angular.io/)
+**Client:** [![Angular](https://img.shields.io/badge/Angular-13-red)](https://angular.io/)
 
-**Server:** [![Java](https://img.shields.io/badge/Java-11.0.2-blue)](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html)
-
-**IDE:** [![IDEA](https://img.shields.io/badge/Intellij-IDEA-blueviolet)](https://www.jetbrains.com/idea/download/)
+**Server:** [![Java](https://img.shields.io/badge/Java-11-blue)](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html)
 
 
-## Installation
+## Compatibility
 
- 1. Clone repo locally:`git clone https://github.com/MATF-Computer-Networks-Projects/2021_DestinedSouls.git`
- 2. Open folder as Intellij IDEA project
- 3. Run/debug configurations
- 4. Add new Maven configuration
- 5. Select working directory to be project directory
- 6. Run main 
- 7. Run server-1.0-SNAPSHOT.jar
- 8. You can access application on [localhost:3000](http://localhost:3000/#/)
+| OS          | Development Kit  |  Last Manual Build   | 
+| ----------- | ---------------- | -------------------  | 
+| **Linux**   | OpenJDK          | `Ubuntu 20.04`       | 
+| **Windows** | JDK              | `Windows 10.0.19042` | 
+
+
+## Build (Maven)
+
+ 1. Clone repo locally:
+ ```bash
+ git clone https://github.com/MATF-Computer-Networks-Projects/2021_DestinedSouls.git
+ ```
+ 2. Navigate into folder
+ ```bash
+ cd 2021_DestinedSouls
+ ```
+ 3. Run Maven package 
+ ```bash
+ mvn package
+ ```
+ 4. Run server-1.0-SNAPSHOT.jar
+ ```bash
+ java -jar Server\target\server-1.0-SNAPSHOT.jar
+ ```
+ 5. You can access application on [port 3000](http://localhost:3000/#/)
+
+## Acknowledgements
+
+ - [Java NIO: Non-blocking Server](http://tutorials.jenkov.com/java-nio/non-blocking-server.html)
+ - [Java WebSocket](https://github.com/TooTallNate/Java-WebSocket)
+ 
 
 ##  Developers
 
