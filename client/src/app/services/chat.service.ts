@@ -22,9 +22,13 @@ export class ChatService {
         if(data.msg)
           return { id: data.id, msg: data.msg };
 
-        if(data.id)
+        if(data.token)
+          return data;
+
+        if(data.id) {
           return { id: data.id }
-        return {}
+        }
+        return null;
       }));
   }
 }

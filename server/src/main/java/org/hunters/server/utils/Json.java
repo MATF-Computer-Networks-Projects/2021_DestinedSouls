@@ -59,11 +59,18 @@ public class Json {
         for(var it : jsonObj.entrySet()) {
             s.append('\"' + it.getKey() + "\":\"" + it.getValue() + "\",");
         }
-        s.setCharAt(s.length()-1, '}');
+        if(s.length() > 1)
+            s.setCharAt(s.length()-1, '}');
+        else
+            s.append('}');
         return s.toString();
     }
 
     public String remove(String key) {
         return this.jsonObj.remove(key);
+    }
+
+    public Map<String, String> asMap() {
+        return jsonObj;
     }
 }

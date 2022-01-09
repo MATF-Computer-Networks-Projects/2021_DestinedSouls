@@ -42,7 +42,14 @@ export class ChatComponent implements OnInit {
     this.messages$.subscribe(
       (msg: Message) => {
               console.log(msg);
-            if(!msg.msg && msg.id) {
+            if(msg.token) {
+              console.log("New match notification!\n" + msg.token);
+              let user = JSON.parse(msg.token);
+              (user as MatchUser).messages = [];
+              this.authenticationService.currentUserValue.matches.push(user);
+              return;
+            }
+            else if(!msg.msg && msg.id) {
               if(this.messagePending.length > 0) {
                 const idx = this.messagePending.findIndex(value => value.id === msg.id);
                 this.matches.find(m => m.id === msg.id).messages.push({received: false, msg: this.messagePending[idx].msg});

@@ -13,7 +13,6 @@ import org.hunters.server.utils.Response;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.function.Predicate;
 
 public class UserService {
     private final static UserTable inMemUserTable = new UserTable();
@@ -72,13 +71,19 @@ public class UserService {
         return picks;
     }
 
-    public static void handleSwipeVote(int userId, int swipeId, boolean like) {
+    /**
+     * Adds prepared potential messages.
+     */
+    public static void handleSwipeVote(int userId, int swipeId, boolean like, Json response) {
         User user = inMemUserTable.getById(userId);
         User swipe = inMemUserTable.getById(swipeId);
         if(like) {
             if(swipe.hasLiked(user.id)) {
                 System.out.println("New match: " + user.name + " " + swipe.name);
-                addMatch(user, swipe);
+                int chatId = addMatch(user, swipe);
+                if(swipe.socketId != -1)
+                    response.put(String.valueOf(swipe.socketId), formattedMatch(chatId, user));
+                response.put(String.valueOf(-swipe.id), formattedMatch(chatId, swipe));
                 return;
             }
             if(!swipe.suggestUser(user)) {
@@ -89,11 +94,16 @@ public class UserService {
         }
         else
             user.blacklistUser(swipe);
+        return;
+    }
+
+    private static String formattedMatch(int matchId, User user) {
+        return "{\"id\":\"" + matchId + "\"," + summary(user) + '}';
     }
 
     private static String formattedMatch(int matchId, int userId) {
         var user = inMemUserTable.getById(userId);
-        return "{\"id\":\"" + matchId + "\"," + summary(user) + '}';
+        return formattedMatch(matchId, user);
     }
 
     /*
@@ -112,10 +122,11 @@ public class UserService {
         return sb.toString();
     }
 
-    private static void addMatch(User user1, User user2) {
+    private static int addMatch(User user1, User user2) {
         int chatId = matchesTable.addMatch(user1.id, user2.id);
         user1.addNewMatch(chatId, user2.id);
         user2.addNewMatch(chatId, user1.id);
+        return chatId;
     }
 
     /*
@@ -212,6 +223,6 @@ public class UserService {
     }
 
     public static void appendMessage(int userId, int chatId, String msg) {
-        getById(userId).pendingMessages.add(new ChatMessage(chatId, msg));
+        inMemUserTable.getById(userId).pendingMessages.add(new ChatMessage(chatId, msg));
     }
 }
