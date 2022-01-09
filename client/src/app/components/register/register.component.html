@@ -60,15 +60,14 @@
                     *ngIf="uploadProgress">delete_forever</mat-icon>
         </span>
       </div>
-      <div >
-
-      </div>
-
+      <br>
 
 
       <div *ngIf="failed">
-          <div id="errorMsg" class="error"></div>
+        <div id="errorMsg" class="error">
+          Max file size is 1MB
         </div>
+      </div>
         <!--<input name="phone" class="input" type="tel" placeholder="Phone number" [(ngModel)]="phone">-->
         <input  type="submit" value="Sign up!" class="btn btn-primary btn-block" style="margin-top: 35px; background-color: rgb(199,146,238);" >
         <!-- <button class="btn btn-primary btn-block" type="submit" style="margin-top: 35px; background-color: rgb(199,146,238);">Sign up!</button> -->

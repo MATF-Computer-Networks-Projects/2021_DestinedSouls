@@ -57,7 +57,7 @@ public class Json {
     public String toString() {
         StringBuilder s = new StringBuilder("{");
         for(var it : jsonObj.entrySet()) {
-            s.append('\"' + it.getKey() + "\":\"" + it.getValue() + "\",");
+            s.append('\"').append(it.getKey()).append("\":\"").append(it.getValue()).append("\",");
         }
         if(s.length() > 1)
             s.setCharAt(s.length()-1, '}');

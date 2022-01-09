@@ -12,13 +12,13 @@ import java.nio.file.Paths;
 public class StorageService {
     public static final Responses cache       = new Responses(FileInfo.PUBLIC_HTML_DIR);
     public static final Path      uploadsDir  = Paths.get( System.getenv("PUBLIC_UPLOADS") != null
-                                                    ? System.getenv("PUBLIC_UPLOADS")
+                                                    ? System.getenv("PUBLIC_UPLOADS").replace('\\', '/')
                                                     : FileInfo.RESOURCES_DIR + "/uploads" );
 
     public static void resetLocalCache() throws IOException {
         StorageService.cache.fillLocalCache();
         StorageService.cache.put("placeholder.png", Responses.createResponseBuffer(
-                            FileInfo.get(Path.of(uploadsDir + "/placeholder.png"), StandardCharsets.US_ASCII)));
+                            FileInfo.get(Paths.get(uploadsDir.toString(), "placeholder.png"), StandardCharsets.US_ASCII)));
     }
 
     public static Path store(byte[] rawFile, String path) throws IOException {
