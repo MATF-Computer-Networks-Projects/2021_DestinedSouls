@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import { Router } from '@angular/router'
 import {AuthenticationService, ChatService, UserService} from 'src/app/services'
-import {LoggedUser, Message, User} from "../../models";
+import {LoggedUser, MatchUser, Message, User} from "../../models";
 
 @Component({
   selector: 'app-homepage',
@@ -18,11 +18,25 @@ export class HomepageComponent implements OnInit, OnDestroy {
               private router: Router) {
     this.chatService.messages.subscribe(
       (msg: Message) => {
+        if(!msg)
+          return;
         console.log(`Response from ${msg.id}: ${msg.msg}`);
-        if (msg.id && msg.msg) {
-          this.authenticationService.currentUserValue.matches.find(m => m.id === msg.id)
-            .messages.push({received: !msg.token, msg: msg.msg});
+        if (msg.id) {
+          if(msg.msg)
+            this.authenticationService.currentUserValue.matches.find(m => m.id === msg.id)
+              .messages.push({received: !msg.token, msg: msg.msg});
         }
+        else if(msg.token) {
+
+          msg.token = msg.token.split("'").join('"');
+
+
+          console.log("New match!\n" + msg.token);
+          let user = (JSON.parse(msg.token) as MatchUser);
+          user.messages = [];
+          this.authenticationService.currentUserValue.matches.push(user);
+        }
+
       }
     );
   }

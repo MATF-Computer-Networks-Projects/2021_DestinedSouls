@@ -8,6 +8,7 @@ import org.hunters.server.utils.Json;
 import org.hunters.server.utils.Response;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 
 public class UserController implements IController {
     private static final String routeRoot = "/users";
@@ -87,12 +88,14 @@ public class UserController implements IController {
 
                 Json[] reqBody = Json.parseJsonArray((String) request.payload);
 
+                var notifications = new Json(); // (chatId, user) pairs
                 for(var json : reqBody) {
                     if(!Validator.validateSchema(json, new String[]{"id", "like"}))
                         return new Response(400, "{\"msg:\":\" Missing key: \"" + json.get("error") + "\"}");
-                    UserService.handleSwipeVote(id, Integer.parseInt(json.get("id")), json.get("like").equals("true"));
+                    int swipeId = Integer.parseInt(json.get("id"));
+                    UserService.handleSwipeVote(id, swipeId, json.get("like").equals("true"), notifications);
                 }
-                return new Response(200, new Json());
+                return new Response(notifications.getSize() > 0 ? -200 : 200, notifications);
             }
             default: return new Response(501);
         }
