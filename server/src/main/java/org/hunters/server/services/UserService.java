@@ -144,7 +144,7 @@ public class UserService {
                 ",\"image\":\"" + user.image + '\"';
     }
 
-    /*
+    /**
      * User as formatted json without password
      */
     public static String omitHash(User user) {
@@ -154,7 +154,7 @@ public class UserService {
                 "\"interest\":\"" + user.interest + "\"";
     }
 
-    /*
+    /**
     * User as formatted json without password with token
     */
     public static String omitHash(User user, String token) {
@@ -203,8 +203,8 @@ public class UserService {
             return new Response(404);
         user.setImage(imagePath.toString().replace('\\','/'));
 
-        String strPath = StorageService.uploadsDir.toString() + "/" + imagePath.getFileName();
-        return new Response(200, "{\"img\":\"" + strPath + "\"}");
+        String strPath = StorageService.uploadsDir + "/" + imagePath.getFileName();
+        return new Response(200, "{\"img\":\"" + strPath.replace('\\','/') + "\"}");
     }
 
     public static int getMatchUser(int chatId, int userId) {

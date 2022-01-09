@@ -54,4 +54,5 @@ Thumbs.db
 [Cc]lient/tmp
 
 **/[Pp]ublic_*
+**/uploads/[0-9]*_*
 

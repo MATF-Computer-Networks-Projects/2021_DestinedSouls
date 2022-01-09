@@ -1,5 +1,7 @@
 package org.hunters.server;
 
+import org.hunters.server.services.UserService;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
@@ -11,12 +13,12 @@ import java.util.*;
 // public class SocketProcessor implements Runnable {
 public class SocketProcessor {
 
-    private Queue<Socket>  inboundSocketQueue   = null;
+    private final Queue<Socket>  inboundSocketQueue;
 
-    private MessageBuffer  readMessageBuffer    = null;
-    private MessageBuffer  writeMessageBuffer   = null;
+    private final MessageBuffer  readMessageBuffer;
+    private final MessageBuffer  writeMessageBuffer;
 
-    private MessageReaderFactory messageReaderFactory = null;
+    private final MessageReaderFactory messageReaderFactory;
 
     private final Queue<Message> outboundMessageQueue = new LinkedList<>();
 
@@ -24,13 +26,13 @@ public class SocketProcessor {
 
     private final ByteBuffer readByteBuffer  = ByteBuffer.allocate(1024 * 1024);
     private final ByteBuffer writeByteBuffer = ByteBuffer.allocate(1024 * 1024);
-    private Selector   readSelector    = null;
-    private Selector   writeSelector   = null;
+    private final Selector   readSelector;
+    private final Selector   writeSelector;
 
-    private MessageProcessor  messageProcessor = null;
-    private WriteProxy        writeProxy       = null;
+    private final MessageProcessor  messageProcessor;
+    private final WriteProxy        writeProxy;
 
-    private long              nextSocketId = 16 * 1024; //start incoming socket ids from 16K - reserve bottom ids for pre-defined sockets (servers).
+    private       long              nextSocketId = 16 * 1024; //start incoming socket ids from 16K - reserve bottom ids for pre-defined sockets (servers).
 
     private final Set<Socket> emptyToNonEmptySockets = new HashSet<>();
     private final Set<Socket> nonEmptyToEmptySockets = new HashSet<>();
@@ -118,7 +120,7 @@ public class SocketProcessor {
         List<Message> fullMessages = socket.messageReader.getMessages();
         if(fullMessages.size() > 0){
             for(Message message : fullMessages){
-                message.socketId = socket.socketId; // TODO: add protocol too
+                message.socketId = socket.socketId;
                 this.messageProcessor.process(message, this.writeProxy);
             }
             fullMessages.clear();
@@ -180,6 +182,13 @@ public class SocketProcessor {
             SelectionKey key = socket.socketChannel.keyFor(this.writeSelector);
 
             key.cancel();
+        }
+        for(var id : UserService.socketsToClose) {
+            if(this.socketMap.containsKey(id))
+                this.socketMap.get(id)
+                        .socketChannel
+                        .keyFor(this.writeSelector)
+                        .cancel();
         }
         nonEmptyToEmptySockets.clear();
     }

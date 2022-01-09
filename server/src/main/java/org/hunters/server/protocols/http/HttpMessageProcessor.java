@@ -143,8 +143,6 @@ public class HttpMessageProcessor {
             sb.setCharAt(sb.length()-1, ']');
         else
             sb.append("]");
-        //sb.setCharAt(sb.length()-1, '\"');
-        //sb.append("]\'");
 
         response.writeToMessage( Responses.createResponseBuffer( FileInfo.json(sb.toString().getBytes() ) ) );
         writeProxy.enqueue(response);
