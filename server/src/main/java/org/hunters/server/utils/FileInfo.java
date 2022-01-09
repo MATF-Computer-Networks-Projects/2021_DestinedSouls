@@ -13,10 +13,10 @@ import java.nio.file.Paths;
 public final class FileInfo {
 
     public final static String PUBLIC_HTML_DIR = System.getenv("PUBLIC_HTML") != null ?
-                                                                                System.getenv("PUBLIC_HTML")
+                                                                                System.getenv("PUBLIC_HTML").replace('\\', '/')
                                                                              :  "client/dist/client";
     public final static String RESOURCES_DIR = System.getenv("RESOURCES") != null ?
-                                                                                System.getenv("RESOURCES")
+                                                                                System.getenv("RESOURCES").replace('\\', '/')
                                                                              :  "server/src/main/resources";
 
     public static FileInfo get(Path path, Charset encoding) throws IOException {

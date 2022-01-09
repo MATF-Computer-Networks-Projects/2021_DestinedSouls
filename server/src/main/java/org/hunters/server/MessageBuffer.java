@@ -49,8 +49,7 @@ public class MessageBuffer {
 
         message.sharedArray = this.smallMessageBuffer;
         message.capacity    = CAPACITY_SMALL;
-        // message.offset      = nextFreeSmallBlock;
-        message.offset      = 0;
+        message.offset      = nextFreeSmallBlock;
         message.length      = 0;
 
         return message;

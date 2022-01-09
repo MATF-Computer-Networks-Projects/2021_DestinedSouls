@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthenticationService, UserService} from "../../services";
 import {Router} from "@angular/router";
-import {Gender, Interest, User} from "../../models";
+import {Gender, Interest, MatchUser, User} from "../../models";
 import {Swipe} from "../../models/swipe";
 
 @Component({
@@ -42,7 +42,13 @@ export class SwipeComponent implements OnInit {
     this.usersShown.splice(0, 1);
     if(this.usersShown.length === 0)
       this.userService.sendSwipeVotes(this.candidates)
-        .pipe().subscribe(data => {});
+        .pipe().subscribe((data: MatchUser[]) => {
+            for(let i = 0; i < data.length; ++i) {
+              data[i].messages = [];
+              this.authenticationService.currentUserValue.matches.push(data[i]);
+            }
+
+      });
 
   }
 

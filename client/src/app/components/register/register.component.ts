@@ -21,6 +21,7 @@ export class RegisterComponent implements OnInit {
   returnUrl: string = "/";
   requiredFileType = "image/*";
   fileName = '';
+  filesize = 0;
   file:File = null;
 
   uploadProgress:number;
@@ -59,6 +60,13 @@ export class RegisterComponent implements OnInit {
         return;
     }
 
+    if(this.file.size > 1024*1024) {
+      this.file = null;
+      this.fileName = '';
+      this.failed = true;
+      return;
+    }
+
     this.loading = true;
     this.failed = false;
     const { image, ...userData } = this.signupForm.value;
@@ -94,6 +102,7 @@ export class RegisterComponent implements OnInit {
   onFileSelected(event) {
     this.file = event.target.files[0];
     this.fileName = this.file.name;
+    this.filesize = this.file.size;
   }
 
   cancelUpload() {

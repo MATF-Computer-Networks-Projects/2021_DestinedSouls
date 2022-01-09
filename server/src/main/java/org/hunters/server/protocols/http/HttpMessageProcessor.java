@@ -4,15 +4,20 @@ import org.hunters.server.Message;
 import org.hunters.server.MessageProcessor;
 import org.hunters.server.WriteProxy;
 import org.hunters.server.models.users.User;
+import org.hunters.server.protocols.ws.WsHeaders;
 import org.hunters.server.routes.ChatController;
 import org.hunters.server.routes.Router;
 import org.hunters.server.services.StorageService;
 import org.hunters.server.services.UserService;
 import org.hunters.server.utils.FileInfo;
+import org.hunters.server.utils.Json;
 import org.hunters.server.utils.Response;
 import org.hunters.server.utils.Responses;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HttpMessageProcessor {
 
@@ -52,6 +57,10 @@ public class HttpMessageProcessor {
         }
 
         var res = router.forward(httpRequest);
+        if(res.status < 0) {
+            notifyChanges(res.json, response, writeProxy);
+            return;
+        }
 
 
         response.writeToMessage( respond(res) );
@@ -79,6 +88,7 @@ public class HttpMessageProcessor {
                 bf.flip();
                 return Responses.createResponseBuffer( FileInfo.json(bf) );
             }
+
             return Responses.createResponseBuffer( FileInfo.json(response.json.toString().getBytes()) );
         }
 
@@ -96,10 +106,11 @@ public class HttpMessageProcessor {
 
         var res = ChatController.onHttpHandle(headers);
         if(res.status == 101) {
-            User user = UserService.getById(Integer.parseInt(res.json.get("userId")));
             response.writeToMessage( Responses.createSwitchingProtocols(res.json.get("key")) );
             writeProxy.enqueue(response);
-            /*
+
+            User user = UserService.getById(Integer.parseInt(res.json.get("userId")));
+
             while(!user.pendingMessages.isEmpty()) {
                 var msg = user.pendingMessages.remove();
                 var newMsg = writeProxy.getMessage();
@@ -107,7 +118,33 @@ public class HttpMessageProcessor {
                 newMsg.writeToMessage(Responses.wsResponse((byte)-127, msg.asJsonString()));
                 writeProxy.enqueue(newMsg);
             }
-             */
+            return;
         }
+        response.writeToMessage( StorageService.cache.get(String.valueOf(res.status)) );
+        writeProxy.enqueue(response);
+    }
+
+    private void notifyChanges(Json res, Message response, WriteProxy writeProxy) {
+        StringBuilder sb = new StringBuilder("[");
+        for(var entry : res.asMap().entrySet()) {
+            int targetSocketId = Integer.parseInt(entry.getKey());
+            String formattedMatch = entry.getValue();
+            if(targetSocketId > 0) { // is socketId
+                var newNotification = writeProxy.getMessage();
+                newNotification.socketId = targetSocketId;
+                newNotification.writeToMessage(Responses.wsResponse((byte)-127,
+                                            "{\"token\":\"" + formattedMatch.replace("\"", "'") + "\"}"));
+                writeProxy.enqueue(newNotification);
+            }
+            else
+                sb.append(formattedMatch).append(",");
+        }
+        if(sb.charAt(sb.length()-1) == ',')
+            sb.setCharAt(sb.length()-1, ']');
+        else
+            sb.append("]");
+
+        response.writeToMessage( Responses.createResponseBuffer( FileInfo.json(sb.toString().getBytes() ) ) );
+        writeProxy.enqueue(response);
     }
 }
